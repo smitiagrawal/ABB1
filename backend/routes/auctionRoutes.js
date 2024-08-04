@@ -6,10 +6,10 @@ const {
     updateAuction,
     deleteAuction,
 } = require('../controllers/auctionController');
-const { protect } = require('../middleware/authMiddleware');
+// const { protect } = require('../middleware/authMiddleware');
 const router = express.Router();
 
-router.route('/').get(getAuctions).post(protect, createAuction);
-router.route('/:id').get(getAuctionById).put(protect, updateAuction).delete(protect, deleteAuction);
+router.route('/').get(getAuctions).post( createAuction);
+router.route('/:id').get(getAuctionById).put(updateAuction).delete(deleteAuction);
 
 module.exports = router;
