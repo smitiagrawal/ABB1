@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }) => {
             setUser(userData);
             setError(''); // Clear any previous error
         } catch (error) {
-            setError(error.message || 'Login failed');
+            setError(error.message || 'Login failed. Invalid Credentials');
             throw error; // Rethrow error to handle it in LoginPage
         }
     };

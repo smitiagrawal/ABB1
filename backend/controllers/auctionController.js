@@ -11,6 +11,11 @@ const getAuctions = asyncHandler(async (req, res) => {
     }
 });
 
+const getUserAuctions = asyncHandler(async (req, res) => {
+    const auctions = await Auction.find({ user: req.user._id });
+    res.json(auctions);
+});
+
 // Get auction by ID
 const getAuctionById = asyncHandler(async (req, res) => {
     const auction = await Auction.findById(req.params.id);
@@ -29,6 +34,31 @@ const createAuction = asyncHandler(async (req, res) => {
     res.status(201).json(createdAuction);
 });
 
+// const createAuction = asyncHandler(async (req, res) => {
+//     const { title, description, startingBid, endDate } = req.body;
+
+//     if (!title || !description || !startingBid || !endDate) {
+//         res.status(400);
+//         throw new Error('Please add all fields');
+//     }
+
+//     try {
+//         const auction = new Auction({
+//             title,
+//             description,
+//             startingBid,
+//             endDate,
+//             user: req.user._id, // Assign the logged-in user as the owner
+//         });
+
+//         const createdAuction = await auction.save();
+//         res.status(201).json(createdAuction);
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500);
+//         throw new Error('Server Error: Unable to create auction');
+//     }
+// });
 // Update an auction
 const updateAuction = asyncHandler(async (req, res) => {
     const { title, description, startingBid, endDate } = req.body;
@@ -64,4 +94,5 @@ module.exports = {
     createAuction,
     updateAuction,
     deleteAuction,
+    getUserAuctions,
 };

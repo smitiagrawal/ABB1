@@ -55,7 +55,8 @@ const NavigationBar = () => {
                         <>
                             <Nav.Link as={Link} to="/">Home</Nav.Link>
                             <Nav.Link as={Link} to="/profile">Profile</Nav.Link>
-                            <Nav.Link as={Link} to="/add-auction">Add Auction</Nav.Link>
+                            <Nav.Link as={Link} to="/add-auction">Create Auction</Nav.Link>
+                            <Nav.Link as={Link} to="/my-auctions">My Auctions</Nav.Link>
                             <Button variant="outline-danger" onClick={logout}>Logout</Button>
                         </>
                     ) : (

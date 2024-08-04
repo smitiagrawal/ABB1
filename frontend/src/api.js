@@ -1,5 +1,5 @@
 import axios from 'axios';
-
+import { Alert } from 'react-bootstrap';
 // Base URL for the backend API
 const API_URL = 'http://localhost:5000/api';
 
@@ -30,6 +30,22 @@ export const addAuction = async (auctionData) => {
     }
 };
 
+// export const addAuction = async (auctionData) => {
+//     try {
+//         const token = localStorage.getItem('token');
+//         const response = await axios.post(`${API_URL}/auctions`, auctionData, {
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 Authorization: `Bearer ${token}`,
+//             },
+//         });
+//         return response.data;
+//     } catch (error) {
+//         console.error('Error adding auction:', error);
+//         throw error;
+//     }
+// };
+
 // Function to handle user login
 // export const loginUser = async (credentials) => {
 //     try {
@@ -52,12 +68,14 @@ export const loginUser = async (credentials) => {
 
         return userData; // Return user data excluding token
     } catch (error) {
-        throw new Error(error.response?.data?.message || 'Login failed');
+        throw new Error(error.response?.data?.message || 'Login failed. Invalid Credentials');
     }
 };
 
 export const logoutUser = () => {
     localStorage.removeItem('token'); // Remove token from localStorage
+    window.location.href = '/'; // Redirect to home page
+    alert('You have been logged out successfully!');
 };
 
 // Function to handle user registration
