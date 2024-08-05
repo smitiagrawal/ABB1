@@ -1,29 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Card, ListGroup, ListGroupItem, Alert, Row, Col, Button } from 'react-bootstrap';
-import ContentLoader from 'react-content-loader'; // Import ContentLoader
-import { fetchUserBids } from '../api'; // Adjust the path as needed
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import ContentLoader from 'react-content-loader';
+import { fetchUserBids } from '../api';
+import { useNavigate } from 'react-router-dom';
 
-// Define fixed dimensions and styles for the card and image
 const cardStyle = {
-  height: 'auto', // Auto height to accommodate content
-  overflow: 'hidden', // Prevent content from overflowing
-  marginBottom: '20px', // Add spacing between cards
-  display: 'flex', // Flexbox for image and content alignment
+  height: 'auto',
+  overflow: 'hidden',
+  marginBottom: '20px',
+  display: 'flex',
 };
 
 const imageStyle = {
-  width: '300px', // Fixed width for image
-  height: '200px', // Fixed height for image
-  objectFit: 'cover', // Cover the area without distorting the image
+  width: '300px',
+  height: '200px',
+  objectFit: 'cover',
 };
 
 const contentStyle = {
-  padding: '10px', // Fixed padding
-  flex: 1, // Allow content to take up remaining space
+  padding: '10px',
+  flex: 1,
 };
 
-// Truncate text to a specified length
 const truncateText = (text, maxLength) => {
   if (text.length <= maxLength) {
     return text;
@@ -39,18 +37,16 @@ const listGroupItemStyle = {
   textOverflow: 'ellipsis',
 };
 const listGroupItemValueStyle = {
-    textAlign: 'right', // Align the text to the right
-    flex: 1, // Allow the value to take up remaining space
-  };
+  textAlign: 'right',
+  flex: 1,
+};
 
-// Truncate text in a list item
 const ListGroupItemFixed = ({ label, value }) => (
-    <ListGroupItem style={listGroupItemStyle}>
-      <span>{label}</span>
-      <span style={listGroupItemValueStyle}>{value}</span>
-    </ListGroupItem>
-  );
-
+  <ListGroupItem style={listGroupItemStyle}>
+    <span>{label}</span>
+    <span style={listGroupItemValueStyle}>{value}</span>
+  </ListGroupItem>
+);
 
 const ShimmerLoader = () => (
   <Row className="g-4">
@@ -82,19 +78,19 @@ const UserBids = () => {
   const [bids, setBids] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchBids = async () => {
       try {
-        setLoading(true); // Set loading state to true when starting fetch
+        setLoading(true);
         const data = await fetchUserBids();
         setBids(data);
-        setLoading(false); // Set loading state to false when fetch completes
+        setLoading(false);
       } catch (error) {
         setError('Error fetching bids. Please try again later.');
         console.error('Error fetching bids:', error);
-        setLoading(false); // Ensure loading is set to false even if there's an error
+        setLoading(false);
       }
     };
 
@@ -102,7 +98,7 @@ const UserBids = () => {
   }, []);
 
   const handleViewItem = (auctionId) => {
-    navigate(`/auction/${auctionId}`); // Navigate to auction detail page
+    navigate(`/auction/${auctionId}`);
   };
 
   if (loading) {
@@ -121,14 +117,14 @@ const UserBids = () => {
       {bids.length > 0 ? (
         <Row className="g-4">
           {bids.map(bid => (
-            bid.auction && ( // Ensure auction is defined
-              <Col key={bid._id} xs={12} sm={6} md={4} lg={3} xl={3}> {/* Adjust column size based on screen size */}
+            bid.auction && (
+              <Col key={bid._id} xs={12} sm={6} md={4} lg={3} xl={3}>
                 <Card className="mb-4" style={cardStyle}>
                   {bid.auction.image && (
-                    <Card.Img 
-                      variant="top" 
-                      src={bid.auction.image} 
-                      alt={bid.auction.title} 
+                    <Card.Img
+                      variant="top"
+                      src={bid.auction.image}
+                      alt={bid.auction.title}
                       style={imageStyle}
                     />
                   )}
@@ -136,26 +132,26 @@ const UserBids = () => {
                     <Card.Header>{bid.auction.title}</Card.Header>
                     <Card.Text>{truncateText(bid.auction.description, 20)}</Card.Text>
                     <ListGroup className="list-group-flush">
-                      <ListGroupItemFixed 
-                        label="Starting Bid:" 
-                        value={`$${bid.auction.startingBid}`} 
+                      <ListGroupItemFixed
+                        label="Starting Bid:"
+                        value={`$${bid.auction.startingBid}`}
                       />
-                      <ListGroupItemFixed 
-                        label="End Date:" 
-                        value={new Date(bid.auction.endDate).toLocaleString()} 
+                      <ListGroupItemFixed
+                        label="End Date:"
+                        value={new Date(bid.auction.endDate).toLocaleString()}
                       />
-                      <ListGroupItemFixed 
-                        label="Your Bid:" 
-                        value={`$${bid.amount}`} 
+                      <ListGroupItemFixed
+                        label="Your Bid:"
+                        value={`$${bid.amount}`}
                       />
-                      <ListGroupItemFixed 
-                        label="Current Bid:" 
-                        value={`$${bid.auction.currentBid}`} 
+                      <ListGroupItemFixed
+                        label="Current Bid:"
+                        value={`$${bid.auction.currentBid}`}
                       />
                     </ListGroup>
-                    <Button 
+                    <Button
                       variant="primary"
-                      onClick={() => handleViewItem(bid.auction._id)} 
+                      onClick={() => handleViewItem(bid.auction._id)}
                       style={{ marginTop: '10px' }}
                     >
                       View Item

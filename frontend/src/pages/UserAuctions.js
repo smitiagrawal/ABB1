@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { getUserAuctions, updateAuction, deleteAuction, getBiddingHistory } from '../api'; // Adjust the import path as necessary
-import { useAuth } from '../context/AuthContext';
 import { Card, Container, Row, Col, Alert, Button, Modal, Form, ListGroup } from 'react-bootstrap';
 import ContentLoader from 'react-content-loader';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -16,17 +15,16 @@ const UserAuctions = () => {
         description: '',
         startingBid: 0,
         endDate: '',
-        image: ''  // Added for image URL
+        image: '',
     });
     const [showBiddingHistoryModal, setShowBiddingHistoryModal] = useState(false);
     const [currentBiddingHistory, setCurrentBiddingHistory] = useState([]);
-    const { user } = useAuth();
 
     useEffect(() => {
         const fetchUserAuctions = async () => {
             try {
                 const data = await getUserAuctions();
-                console.log('Fetched Auctions:', data); // Log the fetched auctions
+                console.log('Fetched Auctions:', data);
                 setAuctions(data);
                 setLoading(false);
             } catch (error) {
@@ -35,7 +33,6 @@ const UserAuctions = () => {
                 setLoading(false);
             }
         };
-
         fetchUserAuctions();
     }, []);
 
@@ -46,8 +43,8 @@ const UserAuctions = () => {
             title: auction.title,
             description: auction.description,
             startingBid: auction.startingBid,
-            endDate: formatDateForInput(endDate), // Convert to local time for the input
-            image: auction.image  // Added for image URL
+            endDate: formatDateForInput(endDate),
+            image: auction.image,
         });
         setShowEditModal(true);
     };
@@ -71,7 +68,7 @@ const UserAuctions = () => {
         setLoading(true);
         setError('');
         try {
-            const updatedEndDate = new Date(newDetails.endDate).toISOString(); // Convert to UTC for storage
+            const updatedEndDate = new Date(newDetails.endDate).toISOString();
             await updateAuction(editingAuction._id, { ...newDetails, endDate: updatedEndDate });
             setAuctions(auctions.map(auction =>
                 auction._id === editingAuction._id ? { ...auction, ...newDetails, endDate: updatedEndDate } : auction
@@ -86,7 +83,6 @@ const UserAuctions = () => {
 
     const handleViewBiddingHistory = async (auctionId) => {
         try {
-            // Fetch the bidding history for the selected auction
             const history = await getBiddingHistory(auctionId);
             setCurrentBiddingHistory(history);
             setShowBiddingHistoryModal(true);
@@ -107,7 +103,7 @@ const UserAuctions = () => {
 
     const formatUTCDateToLocal = (dateString) => {
         const date = new Date(dateString);
-        return date.toLocaleString(); // Adjust as needed for your locale
+        return date.toLocaleString();
     };
 
     const truncateText = (text, maxLength) => {
@@ -155,15 +151,15 @@ const UserAuctions = () => {
                     {auctions.map(auction => (
                         <Col key={auction._id} xs={12} sm={6} md={4} lg={3}>
                             <Card className="mb-4 d-flex flex-column" style={{ width: '100%', height: '100%', maxWidth: '300px' }}>
-                                <Card.Img 
-                                    variant="top" 
-                                    src={auction.image} 
-                                    alt={auction.title} 
-                                    style={{ 
-                                        width: '100%', 
-                                        height: '200px', 
-                                        objectFit: 'cover' 
-                                    }} 
+                                <Card.Img
+                                    variant="top"
+                                    src={auction.image}
+                                    alt={auction.title}
+                                    style={{
+                                        width: '100%',
+                                        height: '200px',
+                                        objectFit: 'cover'
+                                    }}
                                 />
                                 <Card.Body className="d-flex flex-column">
                                     <Card.Title>{auction.title}</Card.Title>
@@ -174,7 +170,7 @@ const UserAuctions = () => {
                                         <strong>Starting Bid: </strong>${auction.startingBid}
                                     </Card.Text>
                                     <Card.Text>
-                                        <strong>Current Bid: </strong>${auction.currentBid} {/* Added current bid */}
+                                        <strong>Current Bid: </strong>${auction.currentBid}
                                     </Card.Text>
                                     <Card.Text>
                                         <strong>End Date: </strong>{formatUTCDateToLocal(auction.endDate)}
@@ -247,7 +243,6 @@ const UserAuctions = () => {
                 </Modal.Body>
             </Modal>
 
-            {/* Bidding History Modal */}
             <Modal show={showBiddingHistoryModal} onHide={() => setShowBiddingHistoryModal(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Bidding History</Modal.Title>

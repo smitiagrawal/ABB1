@@ -29,9 +29,8 @@ const RegisterPage = () => {
             setPassword('');
             setError('');
             alert('User registered successfully');
-            // Log the user in automatically after registration
             await login({ email, password });
-            navigate('/'); // Navigate to the dashboard
+            navigate('/');
         } catch (error) {
             setError('Error registering user');
         }
@@ -56,7 +55,6 @@ const RegisterPage = () => {
         const hasNumber = /\d/.test(password);
         const hasSpecialChar = /[@$!%*?&]/.test(password);
         const hasMinLength = password.length >= 8;
-
         return {
             hasUppercase,
             hasLowercase,
@@ -194,7 +192,7 @@ const RegisterPage = () => {
                             </Button>
                         </Form>
                         <div className="mt-3 text-center">
-                            <p style={{ fontSize: 12, color: 'grey'}}>
+                            <p style={{ fontSize: 12, color: 'grey' }}>
                                 Already have an account? <Link to="/login">Log in here</Link>.
                             </p>
                         </div>

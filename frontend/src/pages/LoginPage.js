@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { loginUser } from '../api';
 import { useAuth as useLogin } from '../context/AuthContext';
 import { Form, Button, Container, Row, Col, Alert } from 'react-bootstrap';
 import { useNavigate, Link } from 'react-router-dom';
@@ -22,7 +21,7 @@ const LoginPage = () => {
             setEmail('');
             setPassword('');
             setError('');
-            navigate('/'); // Navigate to the dashboard
+            navigate('/');
         } catch (error) {
             setError('Error logging in');
         }
@@ -70,8 +69,8 @@ const LoginPage = () => {
                                         onChange={(e) => setPassword(e.target.value)}
                                         required
                                         style={{
-                                            paddingRight: 40, // Add some padding to make room for the eye icon
-                                            boxSizing: 'border-box', // Ensure the padding is included in the width
+                                            paddingRight: 40,
+                                            boxSizing: 'border-box',
                                         }}
                                     />
                                     <span
@@ -80,10 +79,10 @@ const LoginPage = () => {
                                         style={{
                                             position: 'absolute',
                                             right: 10,
-                                            top: '50%', // Adjust the top position to align with the input field
+                                            top: '50%',
                                             transform: 'translateY(-50%)',
                                             cursor: 'pointer',
-                                            zIndex: 1, // Ensure the eye icon is on top of the input field
+                                            zIndex: 1,
                                         }}
                                     >
                                         {showPassword ? (
@@ -104,7 +103,7 @@ const LoginPage = () => {
                             </Button>
                         </Form>
                         <div className="mt-3 text-center">
-                            <p style={{ fontSize: 12, color: 'grey'}}>
+                            <p style={{ fontSize: 12, color: 'grey' }}>
                                 Don't have an account? <Link to="/register">Sign up here</Link>.
                             </p>
                         </div>

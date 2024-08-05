@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getBiddingHistory } from '../api';
-import { Container, ListGroup, Alert } from 'react-bootstrap';
+import { Container, ListGroup } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const BiddingHistoryPage = () => {

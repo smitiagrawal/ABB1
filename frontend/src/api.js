@@ -1,8 +1,6 @@
 import axios from 'axios';
-// Base URL for the backend API
 const API_URL = 'http://localhost:5000/api/';
 
-// Function to fetch all auctions
 export const fetchAuctions = async () => {
     try {
         const response = await axios.get(`${API_URL}auctions`);
@@ -13,7 +11,6 @@ export const fetchAuctions = async () => {
     }
 };
 
-// Function to add a new auction
 export const addAuction = async (auctionData) => {
     const token = localStorage.getItem('token');
     try {
@@ -33,28 +30,24 @@ export const loginUser = async (credentials) => {
     try {
         const response = await axios.post(`${API_URL}users/login`, credentials);
         const { token, ...userData } = response.data;
-
-        // Store the token in localStorage
         localStorage.setItem('token', token);
-
-        return userData; // Return user data excluding token
+        return userData;
     } catch (error) {
         throw new Error(error.response?.data?.message || 'Login failed. Invalid Credentials');
     }
 };
 
 export const logoutUser = () => {
-    localStorage.removeItem('token'); // Remove token from localStorage
-    window.location.href = '/'; // Redirect to home page
+    localStorage.removeItem('token');
+    window.location.href = '/';
     alert('You have been logged out successfully!');
 };
 
-// Function to handle user registration
 export const registerUser = async (userData) => {
     try {
         const response = await axios.post(`${API_URL}users/register`, userData);
         const { token } = response.data;
-        localStorage.setItem('token', token); // Store token in localStorage
+        localStorage.setItem('token', token);
         return response.data;
     } catch (error) {
         console.error('Error registering user:', error);
@@ -77,7 +70,6 @@ export const fetchUserProfile = async () => {
     }
 };
 
-// Update the user profile
 export const updateUserProfile = async (profileData) => {
     const token = localStorage.getItem('token');
     try {
@@ -93,11 +85,9 @@ export const updateUserProfile = async (profileData) => {
     }
 };
 
-
-
 export const getUserAuctions = async () => {
     const token = localStorage.getItem('token');
-    console.log('Token:', token); // Log the token to ensure it's being retrieved correctly
+    console.log('Token:', token);
     try {
         const response = await axios.get(`${API_URL}auctions/user`, {
             headers: {
@@ -126,7 +116,6 @@ export const updateAuction = async (auctionId, auctionData) => {
     }
 };
 
-// Delete an auction
 export const deleteAuction = async (auctionId) => {
     const token = localStorage.getItem('token');
     try {
@@ -196,15 +185,14 @@ export const getAuctionDetails = async (id) => {
 export const fetchUserBids = async () => {
     const token = localStorage.getItem('token');
     try {
-      const response = await axios.get(`${API_URL}bids/user`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return response.data;
+        const response = await axios.get(`${API_URL}bids/user`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
     } catch (error) {
-      console.error('Error fetching user bids:', error);
-      throw error;
+        console.error('Error fetching user bids:', error);
+        throw error;
     }
-  };
-  
+};

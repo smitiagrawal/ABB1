@@ -32,7 +32,7 @@ const HomePage = () => {
 
     const formatUTCDateToLocal = (dateString) => {
         const date = new Date(dateString);
-        return date.toLocaleString(); // Adjust as needed for your locale
+        return date.toLocaleString();
     };
 
     const truncateText = (text, maxLength) => {

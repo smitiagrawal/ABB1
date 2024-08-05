@@ -18,16 +18,16 @@ export const AuthProvider = ({ children }) => {
         try {
             const userData = await loginUser(credentials);
             setUser(userData);
-            setError(''); // Clear any previous error
+            setError('');
         } catch (error) {
             setError(error.message || 'Login failed. Invalid Credentials');
-            throw error; // Rethrow error to handle it in LoginPage
+            throw error;
         }
     };
 
     const logout = () => {
         setUser(null);
-        logoutUser(); // Remove token from localStorage
+        logoutUser();
     };
 
     return (

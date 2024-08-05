@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Modal, Form, Dropdown, Alert, Container, Row, Col } from 'react-bootstrap';
+import { Button, Modal, Form, Dropdown, Container, Row, Col } from 'react-bootstrap';
 import { fetchUserProfile, updateUserProfile } from '../api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -7,12 +7,12 @@ import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 const ProfilePage = () => {
     const [profile, setProfile] = useState(null);
     const [showModal, setShowModal] = useState(false);
-    const [updateType, setUpdateType] = useState(null); // 'name', 'email', 'password'
+    const [updateType, setUpdateType] = useState(null);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         password: '',
-        confirmPassword: '', // Add confirmPassword
+        confirmPassword: '',
         currentPassword: '',
     });
     const [error, setError] = useState('');
@@ -27,7 +27,7 @@ const ProfilePage = () => {
                     name: userProfile.name,
                     email: userProfile.email,
                     password: '',
-                    confirmPassword: '', // Reset confirmPassword
+                    confirmPassword: '',
                     currentPassword: '',
                 });
             } catch (err) {
@@ -45,13 +45,10 @@ const ProfilePage = () => {
 
     const handleUpdateProfile = async () => {
         try {
-            // Validate current password for all updates
             if (!formData.currentPassword) {
                 alert('Current password is required.');
                 return;
             }
-
-            // Validate password if updating it
             if (updateType === 'password') {
                 if (!validatePassword(formData.password)) {
                     alert('Password does not meet the criteria');
@@ -62,28 +59,17 @@ const ProfilePage = () => {
                     return;
                 }
             }
-
-            // Send request to update profile
             await updateUserProfile(formData);
-
-            // Refetch the profile and update state
             const updatedProfile = await fetchUserProfile();
             setProfile(updatedProfile);
-
-            // Update success state and close modal
             setSuccess('Profile updated successfully!');
             setShowModal(false);
             clearFormData();
         } catch (err) {
             let message = 'An error occurred. Please try again later.';
-
-            // Log the error response for debugging
             console.error('Error response:', err.response);
-
             if (err.response && err.response.data && err.response.data.message) {
                 message = err.response.data.message;
-
-                // Check for specific messages and alert accordingly
                 if (message.includes('Email already exists')) {
                     alert('Email already exists. Please use a different email address.');
                 } else if (message.includes('Invalid email')) {
@@ -91,11 +77,9 @@ const ProfilePage = () => {
                 } else if (message.includes('Invalid current password')) {
                     alert('The current password you entered is incorrect. Please try again.');
                 } else {
-                    // For other messages, show a generic alert
                     alert(message);
                 }
             } else {
-                // Handle unexpected errors or no message case
                 alert(message);
             }
 
@@ -108,7 +92,7 @@ const ProfilePage = () => {
             name: '',
             email: '',
             password: '',
-            confirmPassword: '', // Clear confirmPassword
+            confirmPassword: '',
             currentPassword: '',
         });
         setUpdateType(null);
@@ -120,10 +104,7 @@ const ProfilePage = () => {
     };
 
     const isUpdateButtonDisabled = () => {
-        // Check if currentPassword is filled
         if (!formData.currentPassword) return true;
-
-        // Check if required fields are filled based on update type
         if (updateType === 'name') {
             return !formData.name;
         } else if (updateType === 'email') {
@@ -131,8 +112,6 @@ const ProfilePage = () => {
         } else if (updateType === 'password') {
             return !formData.password || !validatePassword(formData.password) || formData.password !== formData.confirmPassword;
         }
-
-        // Disable button if no update type is selected
         return true;
     };
 
@@ -147,7 +126,6 @@ const ProfilePage = () => {
         const hasNumber = /\d/.test(password);
         const hasSpecialChar = /[@$!%*?&]/.test(password);
         const hasMinLength = password.length >= 8;
-
         return {
             hasUppercase,
             hasLowercase,
@@ -162,9 +140,6 @@ const ProfilePage = () => {
     return (
         <Container>
             <h1 className="my-4">Profile</h1>
-            {error && <Alert variant="danger">{error}</Alert>}
-            {success && <Alert variant="success">{success}</Alert>}
-
             <Row className="mb-4">
                 <Col md={6}>
                     <div className="border p-4 rounded shadow-sm">
@@ -174,7 +149,6 @@ const ProfilePage = () => {
                     </div>
                 </Col>
             </Row>
-
             <Modal show={showModal} onHide={handleModalClose}>
                 <Modal.Header closeButton>
                     <Modal.Title>Update Profile</Modal.Title>
@@ -184,14 +158,12 @@ const ProfilePage = () => {
                         <Dropdown.Toggle variant="success" id="dropdown-basic">
                             Select Update Type
                         </Dropdown.Toggle>
-
                         <Dropdown.Menu>
                             <Dropdown.Item onClick={() => setUpdateType('name')}>Update Name</Dropdown.Item>
                             <Dropdown.Item onClick={() => setUpdateType('email')}>Update Email</Dropdown.Item>
                             <Dropdown.Item onClick={() => setUpdateType('password')}>Update Password</Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
-
                     {updateType && (
                         <Form>
                             <Form.Group controlId="formCurrentPassword">
@@ -204,7 +176,6 @@ const ProfilePage = () => {
                                     placeholder="Enter your current password"
                                 />
                             </Form.Group>
-
                             {updateType === 'name' && (
                                 <Form.Group controlId="formName">
                                     <Form.Label>New Name</Form.Label>
@@ -217,7 +188,6 @@ const ProfilePage = () => {
                                     />
                                 </Form.Group>
                             )}
-
                             {updateType === 'email' && (
                                 <Form.Group controlId="formEmail">
                                     <Form.Label>New Email</Form.Label>
@@ -230,7 +200,6 @@ const ProfilePage = () => {
                                     />
                                 </Form.Group>
                             )}
-
                             {updateType === 'password' && (
                                 <>
                                     <Form.Group controlId="formPassword">

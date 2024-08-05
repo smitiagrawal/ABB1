@@ -45,7 +45,7 @@ const AuctionDetailsPage = () => {
             const response = await placeBid(id, Number(bidAmount));
             setAuction((prevAuction) => ({
                 ...prevAuction,
-                currentBid: response.currentBid // Update currentBid with response from backend
+                currentBid: response.currentBid
             }));
             setSuccess('Bid placed successfully');
             setBidAmount('');
@@ -93,9 +93,9 @@ const AuctionDetailsPage = () => {
                                             Bid must be higher than the current bid and starting bid.
                                         </Form.Control.Feedback>
                                     </Form.Group>
-                                    <Button 
-                                        variant="primary" 
-                                        type="submit" 
+                                    <Button
+                                        variant="primary"
+                                        type="submit"
                                         className="mt-2"
                                         disabled={!isValidBid()}
                                     >
