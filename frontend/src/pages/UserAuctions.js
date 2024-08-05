@@ -1,50 +1,51 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import { getUserAuctions } from '../api'; // Import the function to fetch user auctions
 
 const UserAuctionsPage = () => {
-    const { user } = useAuth();
     const [auctions, setAuctions] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
 
     useEffect(() => {
         const fetchUserAuctions = async () => {
             try {
-                const response = await axios.get('/api/auctions/user', {
-                    headers: {
-                        Authorization: `Bearer ${user.token}`,
-                    },
-                });
-                setAuctions(response.data);
+                const data = await getUserAuctions();
+                setAuctions(data);
             } catch (error) {
-                console.error('Error fetching user auctions:', error);
+                console.error('Error fetching user auctions:', error); // Log the full error
+                setError('Failed to fetch user auctions');
+            } finally {
+                setLoading(false);
             }
         };
 
-        if (user) {
-            fetchUserAuctions();
-        }
-    }, [user]);
+        fetchUserAuctions();
+    }, []);
 
-    if (!user) {
-        return <p>You must be logged in to view your auctions.</p>;
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    if (error) {
+        return <div>{error}</div>;
     }
 
     return (
         <div>
-            <h2>Your Auctions</h2>
-            {auctions.length > 0 ? (
+            <h1>Your Auctions</h1>
+            {auctions.length === 0 ? (
+                <p>You have no auctions.</p>
+            ) : (
                 <ul>
                     {auctions.map((auction) => (
                         <li key={auction._id}>
-                            <h3>{auction.title}</h3>
+                            <h2>{auction.title}</h2>
                             <p>{auction.description}</p>
-                            <p>Starting Bid: ${auction.startingBid}</p>
+                            <p>Starting Bid: {auction.startingBid}</p>
                             <p>End Date: {new Date(auction.endDate).toLocaleDateString()}</p>
                         </li>
                     ))}
                 </ul>
-            ) : (
-                <p>You have not created any auctions yet.</p>
             )}
         </div>
     );

@@ -2,33 +2,31 @@ const mongoose = require('mongoose');
 
 const auctionSchema = mongoose.Schema(
     {
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: true,
+            ref: 'User'
+        },
         title: {
             type: String,
-            required: true,
+            required: [true, 'Please add a title']
         },
         description: {
             type: String,
-            required: true,
+            required: [true, 'Please add a description']
         },
         startingBid: {
             type: Number,
-            required: true,
+            required: [true, 'Please add a starting bid']
         },
         endDate: {
             type: Date,
-            required: true,
-        },
-        // user: {
-        //     type: mongoose.Schema.Types.ObjectId,
-        //     required: true,
-        //     ref: 'User',
-        // },
+            required: [true, 'Please add an end date']
+        }
     },
     {
-        timestamps: true,
+        timestamps: true
     }
 );
 
-const Auction = mongoose.model('Auction', auctionSchema);
-
-module.exports = Auction;
+module.exports = mongoose.model('Auction', auctionSchema);

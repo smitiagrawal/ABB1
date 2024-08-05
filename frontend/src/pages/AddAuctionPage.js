@@ -26,24 +26,26 @@ const AddAuctionPage = () => {
     setSuccess('');
     setBidError(false);
     try {
-      if (startingBid < 0) {
-        setBidError(true);
-        setLoading(false);
-        return;
-      }
-      await addAuction({ title, description, startingBid, endDate });
-      setTitle('');
-      setDescription('');
-      setStartingBid(0);
-      setEndDate('');
-      setSuccess('Auction added successfully');
+        const token = localStorage.getItem('token');
+        console.log('Token:', token);  // Add this line for logging
+        if (startingBid < 0) {
+            setBidError(true);
+            setLoading(false);
+            return;
+        }
+        await addAuction({ title, description, startingBid, endDate });
+        setTitle('');
+        setDescription('');
+        setStartingBid(0);
+        setEndDate('');
+        setSuccess('Auction added successfully');
     } catch (error) {
-      console.error('Error adding auction:', error);
-      setError('Error adding auction. Please try again.');
+        console.error('Error adding auction:', error);
+        setError('Error adding auction. Please try again.');
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
 
   const handleBidChange = (e) => {
     const value = e.target.valueAsNumber;
@@ -84,52 +86,52 @@ const AddAuctionPage = () => {
               <Form.Label>Title</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Enter title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                placeholder="Enter title"
                 required
               />
             </Form.Group>
-
             <Form.Group className="mb-3" controlId="formDescription">
               <Form.Label>Description</Form.Label>
               <Form.Control
                 as="textarea"
                 rows={3}
-                placeholder="Enter item description"
                 value={description}
-                onChange={(e) => setDescription(e.target.value.slice(0, 150))}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Enter description"
                 required
               />
-              <div style={{ textAlign: 'right', fontSize: 12 }}>{description.length}/150</div>
             </Form.Group>
-
             <Form.Group className="mb-3" controlId="formStartingBid">
               <Form.Label>Starting Bid</Form.Label>
               <Form.Control
                 type="number"
-                placeholder="Enter starting bid"
                 value={startingBid}
                 onChange={handleBidChange}
+                placeholder="Enter starting bid"
                 required
               />
             </Form.Group>
-
             <Form.Group className="mb-3" controlId="formEndDate">
               <Form.Label>End Date</Form.Label>
               <Form.Control
                 type="date"
-                placeholder="Enter end date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
+                placeholder="Enter end date"
                 required
               />
             </Form.Group>
-
-            <Button variant="primary" type="submit" disabled={!isFormValid() || loading}>
-              {loading? 'Adding...' : 'Add Item to Auction'}
+            <Button variant="primary" type="submit" disabled={loading || !isFormValid()}>
+              {loading ? 'Adding...' : 'Add Auction'}
             </Button>
-            <Button variant="secondary" type="button" onClick={handleClearForm} className="ms-2">
+            <Button
+              variant="secondary"
+              onClick={handleClearForm}
+              className="ms-2"
+              disabled={loading}
+            >
               Clear Form
             </Button>
           </Form>
