@@ -2,25 +2,18 @@ const asyncHandler = require('express-async-handler');
 const User = require('../models/userModel');
 const generateToken = require('../utils/generateToken');
 
-// @desc    Register a new user
-// @route   POST /api/users
-// @access  Public
 const registerUser = asyncHandler(async (req, res) => {
     const { name, email, password } = req.body;
-
     const userExists = await User.findOne({ email });
-
     if (userExists) {
         res.status(400);
         throw new Error('User already exists');
     }
-
     const user = await User.create({
         name,
         email,
         password,
     });
-
     if (user) {
         res.status(201).json({
             _id: user._id,
@@ -34,14 +27,9 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 });
 
-// @desc    Authenticate user & get token
-// @route   POST /api/users/login
-// @access  Public
 const authUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
-
     const user = await User.findOne({ email });
-
     if (user && (await user.matchPassword(password))) {
         res.json({
             _id: user._id,
@@ -55,12 +43,8 @@ const authUser = asyncHandler(async (req, res) => {
     }
 });
 
-// @desc    Get user profile
-// @route   GET /api/users/profile
-// @access  Private
 const getUserProfile = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
-
     if (user) {
         res.json({
             _id: user._id,
@@ -75,29 +59,22 @@ const getUserProfile = asyncHandler(async (req, res) => {
 
 const updateUserProfile = asyncHandler(async (req, res) => {
     const { name, email, password, currentPassword } = req.body;
-
     const user = await User.findById(req.user._id);
-
     if (!user || !(await user.matchPassword(currentPassword))) {
         res.status(400).json({ message: 'Invalid current password' });
-;
         throw new Error('Invalid current password');
     }
-
     if (email && email !== user.email) {
         const emailExists = await User.findOne({ email });
         if (emailExists) {
             res.status(400).json({ message: 'Email already exists' });
-;
             throw new Error('Email already exists');
         }
         user.email = email;
     }
-
     if (name) {
         user.name = name;
     }
-
     if (password) {
         if (await user.matchPassword(password)) {
             res.status(400).json({ message: 'New password cannot be the same as the old password' });
@@ -105,16 +82,13 @@ const updateUserProfile = asyncHandler(async (req, res) => {
         }
         user.password = password;
     }
-
     const updatedUser = await user.save();
-
     res.json({
         _id: updatedUser._id,
         name: updatedUser.name,
         email: updatedUser.email,
     });
 });
-
 
 module.exports = {
     registerUser,

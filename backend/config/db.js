@@ -1,13 +1,10 @@
-// In db.js or another appropriate file
-
 const mongoose = require('mongoose');
-const Auction = require('../models/auctionModel'); // Adjust the path as necessary
-const Bid = require('../models/bidModel'); // Adjust the path as necessary
+const Auction = require('../models/auctionModel');
+const Bid = require('../models/bidModel');
 
-// Fetch auctions for a specific user
 const getAuctionsForUser = async (userId) => {
     try {
-        return await Auction.find({ user: userId }); // Adjust the query as necessary
+        return await Auction.find({ user: userId });
     } catch (error) {
         throw new Error('Error fetching auctions');
     }
@@ -15,7 +12,7 @@ const getAuctionsForUser = async (userId) => {
 
 const getBidsForUser = async (userId) => {
     try {
-        return await Bid.find({ user: userId }).populate('auction'); // Populate auction details
+        return await Bid.find({ user: userId }).populate('auction');
     } catch (error) {
         throw new Error('Error fetching bids');
     }

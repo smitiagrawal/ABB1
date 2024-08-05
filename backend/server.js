@@ -5,7 +5,7 @@ const auctionRoutes = require('./routes/auctionRoutes');
 const userRoutes = require('./routes/userRoutes');
 const bidRoutes = require('./routes/bidRoutes');
 const dotenv = require('dotenv');
-const { getAuctionsForUser } = require('./config/db'); // Adjust the path as necessary
+const { getAuctionsForUser } = require('./config/db');
 const { protect } = require('./middleware/authMiddleware');
 
 const app = express();
@@ -15,7 +15,7 @@ app.use(express.json());
 
 app.get('/api/auctions/user', protect, async (req, res) => {
     try {
-        const userId = req.user.id; // This should now be defined
+        const userId = req.user.id;
         const auctions = await getAuctionsForUser(userId);
         res.json(auctions);
     } catch (error) {

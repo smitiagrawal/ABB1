@@ -1,10 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const Auction = require('../models/auctionModel');
-const path = require('path');
 const Bid = require('../models/bidModel');
-const { getBidsForUser } = require('../config/db'); // Adjust the path as necessary
 
-// Get all auctions
 const getAuctions = asyncHandler(async (req, res) => {
     try {
         const auctions = await Auction.find();
@@ -16,14 +13,11 @@ const getAuctions = asyncHandler(async (req, res) => {
 
 const getUserAuctions = asyncHandler(async (req, res) => {
     const userId = req.user._id;
-
     try {
         if (!userId) {
             return res.status(400).json({ message: 'User ID is missing' });
         }
-
         const auctions = await Auction.find({ user: userId });
-
         if (auctions.length > 0) {
             res.status(200).json(auctions);
         } else {
@@ -53,23 +47,18 @@ const createAuction = asyncHandler(async (req, res) => {
     }
 });
 
-// Update an auction
 const updateAuction = asyncHandler(async (req, res) => {
     const auction = await Auction.findById(req.params.id);
-
     if (auction) {
-        // Check if the logged-in user is the owner of the auction
         if (auction.user.toString() !== req.user._id.toString()) {
             res.status(401);
             throw new Error('User not authorized');
         }
-
         auction.title = req.body.title || auction.title;
         auction.description = req.body.description || auction.description;
         auction.startingBid = req.body.startingBid || auction.startingBid;
         auction.endDate = req.body.endDate || auction.endDate;
-        auction.image = req.body.image || auction.image; // Update image if provided
-
+        auction.image = req.body.image || auction.image;
         const updatedAuction = await auction.save();
         res.status(200).json(updatedAuction);
     } else {
@@ -80,14 +69,11 @@ const updateAuction = asyncHandler(async (req, res) => {
 
 const deleteAuction = asyncHandler(async (req, res) => {
     const auction = await Auction.findById(req.params.id);
-
     if (auction) {
-        // Check if the logged-in user is the owner of the auction
         if (auction.user.toString() !== req.user._id.toString()) {
             res.status(401);
             throw new Error('User not authorized');
         }
-
         await Auction.deleteOne({ _id: req.params.id });
         res.status(200).json({ message: 'Auction removed' });
     } else {
@@ -100,41 +86,33 @@ const placeBid = asyncHandler(async (req, res) => {
     try {
         const { auctionId, amount } = req.body;
         const auction = await Auction.findById(auctionId);
-
         if (!auction) {
             return res.status(404).json({ message: 'Auction not found' });
         }
-
         if (amount <= auction.currentBid) {
             return res.status(400).json({ message: 'Bid amount must be higher than current bid' });
         }
-
         const bid = new Bid({
             amount,
             user: req.user._id,
             auction: auctionId,
         });
-
         await bid.save();
-
         auction.currentBid = amount;
         await auction.save();
-
         res.status(201).json({
             bid,
-            currentBid: auction.currentBid // Send the updated currentBid back in the response
+            currentBid: auction.currentBid
         });
     } catch (error) {
         res.status(500).json({ message: 'Error placing bid', error });
     }
 });
 
-// Get bid history for an auction
 const getBidHistory = asyncHandler(async (req, res) => {
     try {
         const { auctionId } = req.params;
         const bids = await Bid.find({ auction: auctionId }).populate('user', 'name').sort({ date: -1 });
-
         res.status(200).json(bids);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching bid history', error });
@@ -144,7 +122,6 @@ const getBidHistory = asyncHandler(async (req, res) => {
 const getAuctionById = asyncHandler(async (req, res) => {
     try {
         const auction = await Auction.findById(req.params.id);
-
         if (auction) {
             res.status(200).json(auction);
         } else {
