@@ -1,7 +1,8 @@
 const asyncHandler = require('express-async-handler');
 const Auction = require('../models/auctionModel');
 const path = require('path');
-const Bid = require('../models/bid');
+const Bid = require('../models/bidModel');
+const { getBidsForUser } = require('../config/db'); // Adjust the path as necessary
 
 // Get all auctions
 const getAuctions = asyncHandler(async (req, res) => {

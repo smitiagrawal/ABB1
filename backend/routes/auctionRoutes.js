@@ -30,7 +30,7 @@ router.route('/')
     .get(getAuctions)
     .post(protect, upload.single('file'), createAuction);
 router.route('/:id')
-    .get(getAuctionById) // Add this line
+    .get(getAuctionById)
     .put(protect, upload.single('file'), updateAuction)
     .delete(protect, deleteAuction);
 router.route('/user').get(protect, getUserAuctions);

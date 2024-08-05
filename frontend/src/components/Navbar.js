@@ -30,6 +30,8 @@ const NavigationBar = () => {
                             <NavDropdown title="Auctions" id="basic-nav-dropdown">
                                 <NavDropdown.Item as={Link} to="/add-auction">Create Auction</NavDropdown.Item>
                                 <NavDropdown.Item as={Link} to="/my-auctions">My Auctions</NavDropdown.Item>
+                                <NavDropdown.Item as={Link} to="/bids">My Bids</NavDropdown.Item>
+
                             </NavDropdown>
                             <Button variant="outline-danger" onClick={logout}>Logout</Button>
                         </>

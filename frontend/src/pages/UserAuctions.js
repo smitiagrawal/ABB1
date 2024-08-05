@@ -257,7 +257,6 @@ const UserAuctions = () => {
                         <ListGroup>
                             {currentBiddingHistory.map((bid, index) => (
                                 <ListGroup.Item key={index}>
-                                    <strong>Bidder:</strong> {bid.bidder}<br />
                                     <strong>Bid Amount:</strong> ${bid.amount}<br />
                                     <strong>Date:</strong> {formatUTCDateToLocal(bid.date)}
                                 </ListGroup.Item>

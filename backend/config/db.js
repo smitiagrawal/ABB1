@@ -2,6 +2,7 @@
 
 const mongoose = require('mongoose');
 const Auction = require('../models/auctionModel'); // Adjust the path as necessary
+const Bid = require('../models/bidModel'); // Adjust the path as necessary
 
 // Fetch auctions for a specific user
 const getAuctionsForUser = async (userId) => {
@@ -12,4 +13,12 @@ const getAuctionsForUser = async (userId) => {
     }
 };
 
-module.exports = { getAuctionsForUser };
+const getBidsForUser = async (userId) => {
+    try {
+        return await Bid.find({ user: userId }).populate('auction'); // Populate auction details
+    } catch (error) {
+        throw new Error('Error fetching bids');
+    }
+};
+
+module.exports = { getAuctionsForUser, getBidsForUser };

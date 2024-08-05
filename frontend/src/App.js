@@ -9,6 +9,7 @@ import ProfilePage from './pages/ProfilePage';
 import UserAuctions from './pages/UserAuctions';
 import AuctionDetailsPage from './pages/AuctionDetailsPage';
 import BiddingHistoryPage from './pages/BiddingHistoryPage';
+import UserBids from './pages/UserBids';
 
 const App = () => {
     return (
@@ -23,6 +24,7 @@ const App = () => {
                 <Route path="/my-auctions" element={<UserAuctions />} />
                 <Route path="/auction/:id" element={<AuctionDetailsPage />} />
                 <Route path="/auction/:id/bids" element={<BiddingHistoryPage />} />
+                <Route path="/bids" element={<UserBids />} />
             </Routes>
         </Router>
     );

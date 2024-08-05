@@ -73,8 +73,52 @@ const getUserProfile = asyncHandler(async (req, res) => {
     }
 });
 
+const updateUserProfile = asyncHandler(async (req, res) => {
+    const { name, email, password, currentPassword } = req.body;
+
+    const user = await User.findById(req.user._id);
+
+    if (!user || !(await user.matchPassword(currentPassword))) {
+        res.status(400).json({ message: 'Invalid current password' });
+;
+        throw new Error('Invalid current password');
+    }
+
+    if (email && email !== user.email) {
+        const emailExists = await User.findOne({ email });
+        if (emailExists) {
+            res.status(400).json({ message: 'Email already exists' });
+;
+            throw new Error('Email already exists');
+        }
+        user.email = email;
+    }
+
+    if (name) {
+        user.name = name;
+    }
+
+    if (password) {
+        if (await user.matchPassword(password)) {
+            res.status(400).json({ message: 'New password cannot be the same as the old password' });
+            throw new Error('New password cannot be the same as the old password');
+        }
+        user.password = password;
+    }
+
+    const updatedUser = await user.save();
+
+    res.json({
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+    });
+});
+
+
 module.exports = {
     registerUser,
     authUser,
     getUserProfile,
+    updateUserProfile,
 };

@@ -36,7 +36,7 @@ const BiddingHistoryPage = () => {
             <ListGroup>
                 {bids.map((bid, index) => (
                     <ListGroup.Item key={index}>
-                        <strong>User:</strong> {bid.user.username} - <strong>Bid:</strong> ${bid.amount} - <strong>Date:</strong> {new Date(bid.date).toLocaleString()}
+                        <strong>Bid:</strong> ${bid.amount} - <strong>Date:</strong> {new Date(bid.date).toLocaleString()}
                     </ListGroup.Item>
                 ))}
             </ListGroup>

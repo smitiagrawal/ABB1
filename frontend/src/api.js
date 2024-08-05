@@ -76,6 +76,25 @@ export const fetchUserProfile = async () => {
         throw new Error('Failed to fetch user profile');
     }
 };
+
+// Update the user profile
+export const updateUserProfile = async (profileData) => {
+    const token = localStorage.getItem('token');
+    try {
+        const response = await axios.put(`${API_URL}users/profile`, profileData, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error updating profile:', error.response ? error.response.data.message : error.message);
+        throw error;
+    }
+};
+
+
+
 export const getUserAuctions = async () => {
     const token = localStorage.getItem('token');
     console.log('Token:', token); // Log the token to ensure it's being retrieved correctly
@@ -123,17 +142,6 @@ export const deleteAuction = async (auctionId) => {
     }
 };
 
-export const uploadImage = async (formData) => {
-    try {
-        const response = await fetch(`${API_URL}upload`, {
-            method: 'POST',
-            body: formData
-        });
-        return await response.json();
-    } catch (error) {
-        throw new Error('Failed to upload image');
-    }
-};
 
 export const getBiddingHistory = async (id) => {
     const token = localStorage.getItem('token');
@@ -184,3 +192,19 @@ export const getAuctionDetails = async (id) => {
         throw error;
     }
 };
+
+export const fetchUserBids = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.get(`${API_URL}bids/user`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching user bids:', error);
+      throw error;
+    }
+  };
+  
