@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { fetchAuctions } from '../api';
 import { useAuth } from '../context/AuthContext';
 import { Card, Container, Row, Col, Alert, Button } from 'react-bootstrap';
+import { useNavigate, Link } from 'react-router-dom';
 import ContentLoader from 'react-content-loader';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -9,7 +10,9 @@ const HomePage = () => {
     const [auctions, setAuctions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [alertMessage, setAlertMessage] = useState('');
     const { user } = useAuth();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchAllAuctions = async () => {
@@ -54,8 +57,9 @@ const HomePage = () => {
                             style={{ width: '100%', height: '100%' }}
                         >
                             <rect x="5" y="0" rx="5" ry="5" width="100%" height="120" />
-                            <rect x="5" y="130" rx="5" ry="5" width="100%" height="20" />
-                            <rect x="5" y="160" rx="5" ry="5" width="100%" height="20" />
+                            <rect x="5" y="130" rx="5" ry="5" width="60%" height="20" />
+                            <rect x="5" y="160" rx="5" ry="5" width="80%" height="15" />
+                            <rect x="5" y="185" rx="5" ry="5" width="40%" height="15" />
                         </ContentLoader>
                     </Card>
                 </Col>
@@ -63,44 +67,59 @@ const HomePage = () => {
         </Row>
     );
 
+    const handleViewDetails = (auctionId) => {
+        if (!user) {
+            setAlertMessage(
+                <>
+                    You need to be logged in to view auction details.{' '}
+                    <Link to="/login">Go to Login</Link>
+                </>
+            );
+        } else {
+            navigate(`/auction/${auctionId}`);
+        }
+    };
+
     return (
         <Container>
-            <h1 className="my-4">Upcoming Auctions</h1>
-            {loading && renderShimmer()}
-            {error && (
-                <Alert variant="danger" className="my-5">
-                    {error}
-                </Alert>
-            )}
-            {!loading && !error && (
+            <h1 className="mt-3">Auctions</h1>
+            {loading ? (
+                renderShimmer()
+            ) : error ? (
+                <Alert variant="danger">{error}</Alert>
+            ) : auctions.length === 0 ? (
+                <Alert variant="info">No auctions available.</Alert>
+            ) : (
                 <Row className="g-4">
-                    {auctions.map(auction => (
+                    {alertMessage && (
+                        <Alert variant="warning" className="mb-3">
+                            {alertMessage}
+                        </Alert>
+                    )}
+                    {auctions.map((auction) => (
                         <Col key={auction._id} xs={12} sm={6} md={4} lg={3}>
-                            <Card className="mb-4 d-flex flex-column" style={{ width: '100%', height: '100%', maxWidth: '300px' }}>
-                                <Card.Img 
-                                    variant="top" 
-                                    src={auction.image} 
-                                    alt={auction.title} 
-                                    style={{ 
-                                        width: '100%', 
-                                        height: '200px', 
-                                        objectFit: 'cover' // Ensures the image covers the area without stretching
-                                    }} 
+                            <Card className="mb-4">
+                                <Card.Img
+                                    variant="top"
+                                    src={auction.image}
+                                    style={{ width: '100%', height: '200px', objectFit: 'cover' }}
                                 />
-                                <Card.Body className="d-flex flex-column">
+                                <Card.Body>
                                     <Card.Title>{auction.title}</Card.Title>
-                                    <Card.Text className="flex-fill">
+                                    <Card.Text>
                                         {truncateText(auction.description, 20)}
                                     </Card.Text>
                                     <Card.Text>
-                                        <strong>Starting Bid: </strong>${auction.startingBid}
+                                        <strong>Start Bid:</strong> ${auction.startingBid} <br />
+                                        <strong>Current Bid:</strong> ${auction.currentBid} <br />
+                                        <strong>End Date:</strong> {formatUTCDateToLocal(auction.endDate)}
                                     </Card.Text>
-                                    <Card.Text>
-                                        <strong>End Date: </strong>{formatUTCDateToLocal(auction.endDate)}
-                                    </Card.Text>
-                                    {user && (
-                                        <Button variant="info" className="mt-auto">View Details</Button>
-                                    )}
+                                    <Button
+                                        style={{ backgroundColor: user ? '#007bff' : '#6c757d', borderColor: user ? '#007bff' : '#6c757d' }}
+                                        onClick={() => handleViewDetails(auction._id)}
+                                    >
+                                        View Details
+                                    </Button>
                                 </Card.Body>
                             </Card>
                         </Col>

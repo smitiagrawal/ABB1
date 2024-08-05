@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { getUserAuctions, updateAuction, deleteAuction } from '../api';
+import { getUserAuctions, updateAuction, deleteAuction, getBiddingHistory } from '../api'; // Adjust the import path as necessary
 import { useAuth } from '../context/AuthContext';
-import { Card, Container, Row, Col, Alert, Button, Modal, Form } from 'react-bootstrap';
+import { Card, Container, Row, Col, Alert, Button, Modal, Form, ListGroup } from 'react-bootstrap';
 import ContentLoader from 'react-content-loader';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -18,12 +18,15 @@ const UserAuctions = () => {
         endDate: '',
         image: ''  // Added for image URL
     });
+    const [showBiddingHistoryModal, setShowBiddingHistoryModal] = useState(false);
+    const [currentBiddingHistory, setCurrentBiddingHistory] = useState([]);
     const { user } = useAuth();
 
     useEffect(() => {
         const fetchUserAuctions = async () => {
             try {
                 const data = await getUserAuctions();
+                console.log('Fetched Auctions:', data); // Log the fetched auctions
                 setAuctions(data);
                 setLoading(false);
             } catch (error) {
@@ -81,8 +84,19 @@ const UserAuctions = () => {
         setLoading(false);
     };
 
+    const handleViewBiddingHistory = async (auctionId) => {
+        try {
+            // Fetch the bidding history for the selected auction
+            const history = await getBiddingHistory(auctionId);
+            setCurrentBiddingHistory(history);
+            setShowBiddingHistoryModal(true);
+        } catch (error) {
+            console.error('Error fetching bidding history:', error);
+            setError('Failed to fetch bidding history. Please try again later.');
+        }
+    };
+
     const formatDateForInput = (date) => {
-        // Convert local date to the format expected by the input
         const year = date.getFullYear();
         const month = ('0' + (date.getMonth() + 1)).slice(-2);
         const day = ('0' + date.getDate()).slice(-2);
@@ -148,7 +162,7 @@ const UserAuctions = () => {
                                     style={{ 
                                         width: '100%', 
                                         height: '200px', 
-                                        objectFit: 'cover' // Ensures the image covers the area without stretching
+                                        objectFit: 'cover' 
                                     }} 
                                 />
                                 <Card.Body className="d-flex flex-column">
@@ -160,80 +174,100 @@ const UserAuctions = () => {
                                         <strong>Starting Bid: </strong>${auction.startingBid}
                                     </Card.Text>
                                     <Card.Text>
+                                        <strong>Current Bid: </strong>${auction.currentBid} {/* Added current bid */}
+                                    </Card.Text>
+                                    <Card.Text>
                                         <strong>End Date: </strong>{formatUTCDateToLocal(auction.endDate)}
                                     </Card.Text>
                                     <Button variant="primary" onClick={() => handleEditClick(auction)}>Edit</Button>
-                                    <Button variant="danger" onClick={() => handleDeleteClick(auction._id)}>Delete</Button>
+                                    <Button variant="danger" onClick={() => handleDeleteClick(auction._id)} className="mt-2">Delete</Button>
+                                    <Button variant="secondary" onClick={() => handleViewBiddingHistory(auction._id)} className="mt-2">View Bidding History</Button>
                                 </Card.Body>
                             </Card>
                         </Col>
                     ))}
                 </Row>
             )}
-            {editingAuction && (
-                <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Edit Auction</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <Form onSubmit={handleUpdate}>
-                            <Form.Group controlId="formTitle">
-                                <Form.Label>Title</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Enter title"
-                                    value={newDetails.title}
-                                    onChange={(e) => setNewDetails({ ...newDetails, title: e.target.value })}
-                                    required
-                                />
-                            </Form.Group>
-                            <Form.Group controlId="formDescription">
-                                <Form.Label>Description</Form.Label>
-                                <Form.Control
-                                    as="textarea"
-                                    rows={3}
-                                    placeholder="Enter description"
-                                    value={newDetails.description}
-                                    onChange={(e) => setNewDetails({ ...newDetails, description: e.target.value })}
-                                    required
-                                />
-                            </Form.Group>
-                            <Form.Group controlId="formStartingBid">
-                                <Form.Label>Starting Bid</Form.Label>
-                                <Form.Control
-                                    type="number"
-                                    placeholder="Enter starting bid"
-                                    value={newDetails.startingBid}
-                                    onChange={(e) => setNewDetails({ ...newDetails, startingBid: e.target.value })}
-                                    required
-                                />
-                            </Form.Group>
-                            <Form.Group controlId="formEndDate">
-                                <Form.Label>End Date</Form.Label>
-                                <Form.Control
-                                    type="datetime-local"
-                                    value={newDetails.endDate}
-                                    onChange={(e) => setNewDetails({ ...newDetails, endDate: e.target.value })}
-                                    required
-                                />
-                            </Form.Group>
-                            <Form.Group controlId="formImage">
-                                <Form.Label>Image URL</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Enter image URL"
-                                    value={newDetails.image}
-                                    onChange={(e) => setNewDetails({ ...newDetails, image: e.target.value })}
-                                    required
-                                />
-                            </Form.Group>
-                            <Button variant="primary" type="submit">
-                                Update Auction
-                            </Button>
-                        </Form>
-                    </Modal.Body>
-                </Modal>
-            )}
+            <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Auction</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form onSubmit={handleUpdate}>
+                        <Form.Group controlId="formTitle">
+                            <Form.Label>Title</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder="Enter auction title"
+                                value={newDetails.title}
+                                onChange={(e) => setNewDetails({ ...newDetails, title: e.target.value })}
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="formDescription">
+                            <Form.Label>Description</Form.Label>
+                            <Form.Control
+                                as="textarea"
+                                rows={3}
+                                placeholder="Enter auction description"
+                                value={newDetails.description}
+                                onChange={(e) => setNewDetails({ ...newDetails, description: e.target.value })}
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="formStartingBid">
+                            <Form.Label>Starting Bid</Form.Label>
+                            <Form.Control
+                                type="number"
+                                placeholder="Enter starting bid"
+                                value={newDetails.startingBid}
+                                onChange={(e) => setNewDetails({ ...newDetails, startingBid: e.target.value })}
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="formEndDate">
+                            <Form.Label>End Date</Form.Label>
+                            <Form.Control
+                                type="datetime-local"
+                                placeholder="Select end date"
+                                value={newDetails.endDate}
+                                onChange={(e) => setNewDetails({ ...newDetails, endDate: e.target.value })}
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="formImage">
+                            <Form.Label>Image URL</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder="Enter image URL"
+                                value={newDetails.image}
+                                onChange={(e) => setNewDetails({ ...newDetails, image: e.target.value })}
+                            />
+                        </Form.Group>
+                        <Button variant="primary" type="submit" className="mt-3">
+                            Update Auction
+                        </Button>
+                    </Form>
+                </Modal.Body>
+            </Modal>
+
+            {/* Bidding History Modal */}
+            <Modal show={showBiddingHistoryModal} onHide={() => setShowBiddingHistoryModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Bidding History</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {currentBiddingHistory.length > 0 ? (
+                        <ListGroup>
+                            {currentBiddingHistory.map((bid, index) => (
+                                <ListGroup.Item key={index}>
+                                    <strong>Bidder:</strong> {bid.bidder}<br />
+                                    <strong>Bid Amount:</strong> ${bid.amount}<br />
+                                    <strong>Date:</strong> {formatUTCDateToLocal(bid.date)}
+                                </ListGroup.Item>
+                            ))}
+                        </ListGroup>
+                    ) : (
+                        <p>No bidding history available.</p>
+                    )}
+                </Modal.Body>
+            </Modal>
         </Container>
     );
 };

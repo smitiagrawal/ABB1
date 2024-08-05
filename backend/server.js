@@ -6,6 +6,8 @@ const userRoutes = require('./routes/userRoutes');
 const dotenv = require('dotenv');
 const path = require('path');
 const multer = require('multer');
+const { getAuctionsForUser } = require('./config/db'); // Adjust the path as necessary
+const { protect } = require('./middleware/authMiddleware');
 
 const app = express();
 dotenv.config();
@@ -23,7 +25,16 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
-
+app.get('/api/auctions/user', protect, async (req, res) => {
+  try {
+      const userId = req.user.id; // This should now be defined
+      const auctions = await getAuctionsForUser(userId);
+      res.json(auctions);
+  } catch (error) {
+      console.error('Error fetching auctions:', error);
+      res.status(500).json({ message: 'Internal Server Error', error: error.message });
+  }
+});
 app.use('/uploads', express.static('uploads'));
 app.use('/api/auctions', auctionRoutes);
 app.use('/api/users', userRoutes);

@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const Auction = require('../models/auctionModel');
 const path = require('path');
+const Bid = require('../models/bid');
 
 // Get all auctions
 const getAuctions = asyncHandler(async (req, res) => {
@@ -13,16 +14,23 @@ const getAuctions = asyncHandler(async (req, res) => {
 });
 
 const getUserAuctions = asyncHandler(async (req, res) => {
-    const userId = req.user._id; // Ensure this is a valid ObjectId
-    console.log('User ID:', userId); // Log the user ID to verify it's correct
+    const userId = req.user._id;
 
-    const auctions = await Auction.find({ user: userId });
+    try {
+        if (!userId) {
+            return res.status(400).json({ message: 'User ID is missing' });
+        }
 
-    if (auctions) {
-        res.status(200).json(auctions);
-    } else {
-        res.status(404);
-        throw new Error('No auctions found');
+        const auctions = await Auction.find({ user: userId });
+
+        if (auctions.length > 0) {
+            res.status(200).json(auctions);
+        } else {
+            res.status(404).json({ message: 'No auctions found' });
+        }
+    } catch (error) {
+        console.error('Error fetching user auctions:', error);
+        res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
 });
 
@@ -87,10 +95,72 @@ const deleteAuction = asyncHandler(async (req, res) => {
     }
 });
 
+const placeBid = asyncHandler(async (req, res) => {
+    try {
+        const { auctionId, amount } = req.body;
+        const auction = await Auction.findById(auctionId);
+
+        if (!auction) {
+            return res.status(404).json({ message: 'Auction not found' });
+        }
+
+        if (amount <= auction.currentBid) {
+            return res.status(400).json({ message: 'Bid amount must be higher than current bid' });
+        }
+
+        const bid = new Bid({
+            amount,
+            user: req.user._id,
+            auction: auctionId,
+        });
+
+        await bid.save();
+
+        auction.currentBid = amount;
+        await auction.save();
+
+        res.status(201).json({
+            bid,
+            currentBid: auction.currentBid // Send the updated currentBid back in the response
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Error placing bid', error });
+    }
+});
+
+// Get bid history for an auction
+const getBidHistory = asyncHandler(async (req, res) => {
+    try {
+        const { auctionId } = req.params;
+        const bids = await Bid.find({ auction: auctionId }).populate('user', 'name').sort({ date: -1 });
+
+        res.status(200).json(bids);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching bid history', error });
+    }
+});
+
+const getAuctionById = asyncHandler(async (req, res) => {
+    try {
+        const auction = await Auction.findById(req.params.id);
+
+        if (auction) {
+            res.status(200).json(auction);
+        } else {
+            res.status(404).json({ message: 'Auction not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching auction', error });
+    }
+});
+
 module.exports = {
     getAuctions,
     createAuction,
     updateAuction,
     deleteAuction,
     getUserAuctions,
+    placeBid,
+    getBidHistory,
+    getAuctionById,
 };

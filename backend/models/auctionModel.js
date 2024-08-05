@@ -19,6 +19,10 @@ const auctionSchema = mongoose.Schema(
             type: Number,
             required: [true, 'Please add a starting bid']
         },
+        currentBid: {
+            type: Number,
+            default: 0,
+        },
         endDate: {
             type: Date,
             required: [true, 'Please add an end date']
@@ -26,7 +30,7 @@ const auctionSchema = mongoose.Schema(
         image: {
             type: String, // URL to the image
             required: [true, 'Please add an image']
-        }
+        },
     },
     {
         timestamps: true

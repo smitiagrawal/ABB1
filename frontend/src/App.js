@@ -7,6 +7,8 @@ import AddAuctionPage from './pages/AddAuctionPage';
 import Navbar from './components/Navbar';
 import ProfilePage from './pages/ProfilePage';
 import UserAuctions from './pages/UserAuctions';
+import AuctionDetailsPage from './pages/AuctionDetailsPage';
+import BiddingHistoryPage from './pages/BiddingHistoryPage';
 
 const App = () => {
     return (
@@ -19,6 +21,8 @@ const App = () => {
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/add-auction" element={<AddAuctionPage />} />
                 <Route path="/my-auctions" element={<UserAuctions />} />
+                <Route path="/auction/:id" element={<AuctionDetailsPage />} />
+                <Route path="/auction/:id/bids" element={<BiddingHistoryPage />} />
             </Routes>
         </Router>
     );

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { loginUser } from '../api';
 import { useAuth as useLogin } from '../context/AuthContext';
 import { Form, Button, Container, Row, Col, Alert } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
@@ -42,7 +42,9 @@ const LoginPage = () => {
                 <Col md={6} lg={4} className="ml-0">
                     <div className="auth-card">
                         <h2 className="my-4">Log In</h2>
-                        <p style={{ fontSize: 12, color: 'grey', marginTop: -15 }}>Welcome back! Enter your login credentials to access your account</p>
+                        <p style={{ fontSize: 12, color: 'grey', marginTop: -15 }}>
+                            Welcome back! Enter your login credentials to access your account
+                        </p>
                         {error && <Alert variant="danger">{error}</Alert>}
                         <Form onSubmit={handleSubmit}>
                             <Form.Group className="mb-3" controlId="formBasicEmail">
@@ -101,6 +103,11 @@ const LoginPage = () => {
                                 Log In
                             </Button>
                         </Form>
+                        <div className="mt-3 text-center">
+                            <p style={{ fontSize: 12, color: 'grey'}}>
+                                Don't have an account? <Link to="/register">Sign up here</Link>.
+                            </p>
+                        </div>
                     </div>
                 </Col>
             </Row>

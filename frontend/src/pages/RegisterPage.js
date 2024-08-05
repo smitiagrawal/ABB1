@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { registerUser } from '../api';
 import { useAuth as useLogin } from '../context/AuthContext';
 import { Form, Button, Container, Row, Col, Alert } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -193,11 +193,16 @@ const RegisterPage = () => {
                                 Register
                             </Button>
                         </Form>
+                        <div className="mt-3 text-center">
+                            <p style={{ fontSize: 12, color: 'grey'}}>
+                                Already have an account? <Link to="/login">Log in here</Link>.
+                            </p>
+                        </div>
                     </div>
                 </Col>
             </Row>
         </Container>
-    )
-}
+    );
+};
 
-export default RegisterPage
+export default RegisterPage;

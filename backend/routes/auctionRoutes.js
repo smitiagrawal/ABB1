@@ -5,6 +5,9 @@ const {
     updateAuction,
     deleteAuction,
     getUserAuctions,
+    placeBid,
+    getBidHistory,
+    getAuctionById,
 } = require('../controllers/auctionController');
 const { protect } = require('../middleware/authMiddleware');
 const multer = require('multer');
@@ -24,11 +27,14 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 router.route('/')
-  .get(getAuctions)
-  .post(protect, upload.single('file'), createAuction);
+    .get(getAuctions)
+    .post(protect, upload.single('file'), createAuction);
 router.route('/:id')
-  .put(protect, upload.single('file'), updateAuction)
-  .delete(protect, deleteAuction);
+    .get(getAuctionById) // Add this line
+    .put(protect, upload.single('file'), updateAuction)
+    .delete(protect, deleteAuction);
 router.route('/user').get(protect, getUserAuctions);
+router.route('/bid').post(protect, placeBid);
+router.route('/:auctionId/bids').get(getBidHistory);
 
 module.exports = router;

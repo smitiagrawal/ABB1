@@ -1,9 +1,6 @@
 import axios from 'axios';
 // Base URL for the backend API
 const API_URL = 'http://localhost:5000/api/';
-// const API_URL2 = 'http://localhost:5000/api/auctions';
-
-
 
 // Function to fetch all auctions
 export const fetchAuctions = async () => {
@@ -135,5 +132,55 @@ export const uploadImage = async (formData) => {
         return await response.json();
     } catch (error) {
         throw new Error('Failed to upload image');
+    }
+};
+
+export const getBiddingHistory = async (id) => {
+    const token = localStorage.getItem('token');
+    try {
+        const response = await axios.get(`${API_URL}auctions/${id}/bids`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching bidding history:', error);
+        throw error;
+    }
+};
+
+export const placeBid = async (auctionId, bidAmount) => {
+    const token = localStorage.getItem('token');
+    try {
+        const response = await axios.post(
+            `${API_URL}auctions/bid`,
+            { auctionId, amount: bidAmount },
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Error placing bid:', error);
+        throw error;
+    }
+};
+
+export const getAuctionDetails = async (id) => {
+    const token = localStorage.getItem('token');
+    try {
+        const response = await axios.get(`${API_URL}auctions/${id}`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching auction details:', error);
+        throw error;
     }
 };

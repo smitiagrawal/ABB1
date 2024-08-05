@@ -1,14 +1,15 @@
+// In db.js or another appropriate file
+
 const mongoose = require('mongoose');
+const Auction = require('../models/auctionModel'); // Adjust the path as necessary
 
-const connectDB = async () => {
+// Fetch auctions for a specific user
+const getAuctionsForUser = async (userId) => {
     try {
-        const conn = await mongoose.connect(process.env.MONGO_URI);
-
-        console.log(`MongoDB Connected: ${conn.connection.host}`);
+        return await Auction.find({ user: userId }); // Adjust the query as necessary
     } catch (error) {
-        console.error(`Error: ${error.message}`);
-        process.exit(1);
+        throw new Error('Error fetching auctions');
     }
 };
 
-module.exports = connectDB;
+module.exports = { getAuctionsForUser };
