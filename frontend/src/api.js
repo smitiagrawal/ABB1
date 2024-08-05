@@ -32,34 +32,6 @@ export const addAuction = async (auctionData) => {
     }
 };
 
-// export const addAuction = async (auctionData) => {
-//     try {
-//         const token = localStorage.getItem('token');
-//         const response = await axios.post(`${API_URL}/auctions`, auctionData, {
-//             headers: {
-//                 'Content-Type': 'application/json',
-//                 Authorization: `Bearer ${token}`,
-//             },
-//         });
-//         return response.data;
-//     } catch (error) {
-//         console.error('Error adding auction:', error);
-//         throw error;
-//     }
-// };
-
-// Function to handle user login
-// export const loginUser = async (credentials) => {
-//     try {
-//         const response = await axios.post(`${API_URL}/users/login`, credentials);
-//         const { token } = response.data;
-//         localStorage.setItem('token', token); // Store token in localStorage
-//         return response.data;
-//     } catch (error) {
-//         console.error('Error logging in:', error);
-//         throw error;
-//     }
-// };
 export const loginUser = async (credentials) => {
     try {
         const response = await axios.post(`${API_URL}users/login`, credentials);
@@ -119,6 +91,37 @@ export const getUserAuctions = async () => {
         return response.data;
     } catch (error) {
         console.error('Error fetching user auctions:', error.response ? error.response.data : error.message);
+        throw error;
+    }
+};
+
+export const updateAuction = async (auctionId, auctionData) => {
+    const token = localStorage.getItem('token');
+    try {
+        const response = await axios.put(`${API_URL}auctions/${auctionId}`, auctionData, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error updating auction:', error.response ? error.response.data.message : error.message);
+        throw error;
+    }
+};
+
+// Delete an auction
+export const deleteAuction = async (auctionId) => {
+    const token = localStorage.getItem('token');
+    try {
+        const response = await axios.delete(`${API_URL}auctions/${auctionId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting auction:', error.response ? error.response.data.message : error.message);
         throw error;
     }
 };

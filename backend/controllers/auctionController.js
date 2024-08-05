@@ -63,38 +63,46 @@ const createAuction = asyncHandler(async (req, res) => {
 
 // Update an auction
 const updateAuction = asyncHandler(async (req, res) => {
-    try {
-        const { title, description, startingBid, endDate } = req.body;
-        const auction = await Auction.findById(req.params.id);
+    const auction = await Auction.findById(req.params.id);
 
-        if (auction) {
-            auction.title = title || auction.title;
-            auction.description = description || auction.description;
-            auction.startingBid = startingBid || auction.startingBid;
-            auction.endDate = endDate || auction.endDate;
-
-            const updatedAuction = await auction.save();
-            res.json(updatedAuction);
-        } else {
-            res.status(404).json({ message: 'Auction not found' });
+    if (auction) {
+        // Check if the logged-in user is the owner of the auction
+        if (auction.user.toString() !== req.user._id.toString()) {
+            res.status(401);
+            throw new Error('User not authorized');
         }
-    } catch (error) {
-        res.status(400).json({ message: 'Error updating auction', error });
+
+        auction.title = req.body.title || auction.title;
+        auction.description = req.body.description || auction.description;
+        auction.startingBid = req.body.startingBid || auction.startingBid;
+        auction.endDate = req.body.endDate || auction.endDate;
+
+        const updatedAuction = await auction.save();
+        res.status(200).json(updatedAuction);
+    } else {
+        res.status(404);
+        throw new Error('Auction not found');
     }
 });
 
-// Delete an auction
+// @desc    Delete an auction
+// @route   DELETE /api/auctions/:id
+// @access  Private
 const deleteAuction = asyncHandler(async (req, res) => {
-    try {
-        const auction = await Auction.findById(req.params.id);
-        if (auction) {
-            await auction.remove();
-            res.json({ message: 'Auction removed' });
-        } else {
-            res.status(404).json({ message: 'Auction not found' });
+    const auction = await Auction.findById(req.params.id);
+
+    if (auction) {
+        // Check if the logged-in user is the owner of the auction
+        if (auction.user.toString() !== req.user._id.toString()) {
+            res.status(401);
+            throw new Error('User not authorized');
         }
-    } catch (error) {
-        res.status(400).json({ message: 'Error deleting auction', error });
+
+        await Auction.deleteOne({ _id: req.params.id });
+        res.status(200).json({ message: 'Auction removed' });
+    } else {
+        res.status(404);
+        throw new Error('Auction not found');
     }
 });
 

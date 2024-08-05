@@ -18,7 +18,7 @@ const AddAuctionPage = () => {
   if (!user) {
     return <Container><p>You must be logged in to add auctions.</p></Container>;
   }
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -114,12 +114,12 @@ const AddAuctionPage = () => {
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="formEndDate">
-              <Form.Label>End Date</Form.Label>
+              <Form.Label>End Date & Time</Form.Label>
               <Form.Control
-                type="date"
+                type="datetime-local"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                placeholder="Enter end date"
+                placeholder="Enter end date and time"
                 required
               />
             </Form.Group>
