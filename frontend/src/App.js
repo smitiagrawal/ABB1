@@ -6,7 +6,8 @@ import RegisterPage from './pages/RegisterPage';
 import AddAuctionPage from './pages/AddAuctionPage';
 import Navbar from './components/Navbar';
 import ProfilePage from './pages/ProfilePage';
-import UserAuctionsPage from './pages/UserAuctions';
+import UserAuctions from './pages/UserAuctions';
+
 const App = () => {
     return (
         <Router>
@@ -16,9 +17,8 @@ const App = () => {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
-                <Route path='/add-auction' element={<AddAuctionPage/>}/>
-                <Route path="/my-auctions" element={<UserAuctionsPage />} />
-
+                <Route path="/add-auction" element={<AddAuctionPage />} />
+                <Route path="/my-auctions" element={<UserAuctions />} />
             </Routes>
         </Router>
     );

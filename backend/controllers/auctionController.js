@@ -1,5 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const Auction = require('../models/auctionModel');
+const path = require('path');
 
 // Get all auctions
 const getAuctions = asyncHandler(async (req, res) => {
@@ -25,33 +26,15 @@ const getUserAuctions = asyncHandler(async (req, res) => {
     }
 });
 
-
-// Get auction by ID
-// const getAuctionById = asyncHandler(async (req, res) => {
-//     const auction = await Auction.findById(req.params.id);
-//     if (auction) {
-//         res.json(auction);
-//     } else {
-//         res.status(404).json({ message: 'Auction not found' });
-//     }
-// });
-
-// Create a new auction
-// const createAuction = asyncHandler(async (req, res) => {
-//     const { title, description, startingBid, endDate } = req.body;
-//     const auction = new Auction({ title, description, startingBid, endDate });
-//     const createdAuction = await auction.save();
-//     res.status(201).json(createdAuction);
-// });
-
 const createAuction = asyncHandler(async (req, res) => {
     try {
-        const { title, description, startingBid, endDate } = req.body;
+        const { title, description, startingBid, endDate, image } = req.body;
         const auction = new Auction({
             title,
             description,
             startingBid,
             endDate,
+            image,
             user: req.user._id
         });
         const createdAuction = await auction.save();
@@ -76,6 +59,7 @@ const updateAuction = asyncHandler(async (req, res) => {
         auction.description = req.body.description || auction.description;
         auction.startingBid = req.body.startingBid || auction.startingBid;
         auction.endDate = req.body.endDate || auction.endDate;
+        auction.image = req.body.image || auction.image; // Update image if provided
 
         const updatedAuction = await auction.save();
         res.status(200).json(updatedAuction);
@@ -85,9 +69,6 @@ const updateAuction = asyncHandler(async (req, res) => {
     }
 });
 
-// @desc    Delete an auction
-// @route   DELETE /api/auctions/:id
-// @access  Private
 const deleteAuction = asyncHandler(async (req, res) => {
     const auction = await Auction.findById(req.params.id);
 
@@ -108,7 +89,6 @@ const deleteAuction = asyncHandler(async (req, res) => {
 
 module.exports = {
     getAuctions,
-    // getAuctionById,
     createAuction,
     updateAuction,
     deleteAuction,

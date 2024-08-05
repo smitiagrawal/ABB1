@@ -10,6 +10,7 @@ const AddAuctionPage = () => {
   const [description, setDescription] = useState('');
   const [startingBid, setStartingBid] = useState(0);
   const [endDate, setEndDate] = useState('');
+  const [image, setImage] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
@@ -26,26 +27,25 @@ const AddAuctionPage = () => {
     setSuccess('');
     setBidError(false);
     try {
-        const token = localStorage.getItem('token');
-        console.log('Token:', token);  // Add this line for logging
-        if (startingBid < 0) {
-            setBidError(true);
-            setLoading(false);
-            return;
-        }
-        await addAuction({ title, description, startingBid, endDate });
-        setTitle('');
-        setDescription('');
-        setStartingBid(0);
-        setEndDate('');
-        setSuccess('Auction added successfully');
-    } catch (error) {
-        console.error('Error adding auction:', error);
-        setError('Error adding auction. Please try again.');
-    } finally {
+      if (startingBid < 0) {
+        setBidError(true);
         setLoading(false);
+        return;
+      }
+      await addAuction({ title, description, startingBid, endDate, image });
+      setTitle('');
+      setDescription('');
+      setStartingBid(0);
+      setEndDate('');
+      setImage('');
+      setSuccess('Auction added successfully');
+    } catch (error) {
+      console.error('Error adding auction:', error);
+      setError('Error adding auction. Please try again.');
+    } finally {
+      setLoading(false);
     }
-};
+  };
 
   const handleBidChange = (e) => {
     const value = e.target.valueAsNumber;
@@ -62,14 +62,16 @@ const AddAuctionPage = () => {
     setDescription('');
     setStartingBid(0);
     setEndDate('');
+    setImage('');
   };
 
   const isFormValid = () => {
     return (
-      title.trim()!== '' &&
-      description.trim()!== '' &&
+      title.trim() !== '' &&
+      description.trim() !== '' &&
       startingBid > 0 &&
-      endDate.trim()!== ''
+      endDate.trim() !== '' &&
+      image.trim() !== ''
     );
   };
 
@@ -120,6 +122,16 @@ const AddAuctionPage = () => {
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 placeholder="Enter end date and time"
+                required
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="formImage">
+              <Form.Label>Image URL</Form.Label>
+              <Form.Control
+                type="text"
+                value={image}
+                onChange={(e) => setImage(e.target.value)}
+                placeholder="Enter image URL"
                 required
               />
             </Form.Group>

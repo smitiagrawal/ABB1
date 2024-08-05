@@ -22,6 +22,10 @@ const auctionSchema = mongoose.Schema(
         endDate: {
             type: Date,
             required: [true, 'Please add an end date']
+        },
+        image: {
+            type: String, // URL to the image
+            required: [true, 'Please add an image']
         }
     },
     {

@@ -125,3 +125,15 @@ export const deleteAuction = async (auctionId) => {
         throw error;
     }
 };
+
+export const uploadImage = async (formData) => {
+    try {
+        const response = await fetch(`${API_URL}upload`, {
+            method: 'POST',
+            body: formData
+        });
+        return await response.json();
+    } catch (error) {
+        throw new Error('Failed to upload image');
+    }
+};
