@@ -101,7 +101,6 @@ const AddAuctionPage = () => {
                 rows={3}
                 value={description}
                 onChange={(e) => setDescription(e.target.value.slice(0, 150))}
-                // onChange={(e) => setDescription(e.target.value)}
                 placeholder="Enter description"
                 required
               />

@@ -170,6 +170,11 @@ const UserAuctions = () => {
                     {error}
                 </Alert>
             )}
+            {!loading && !error && auctions.length === 0 && (
+                <Alert variant="info" className="my-5">
+                    You have no auctions.
+                </Alert>
+            )}
             {!loading && !error && (
                 <Row className="g-4">
                     {auctions.map(auction => (
@@ -198,7 +203,7 @@ const UserAuctions = () => {
                                 <Card.Body className="d-flex flex-column">
                                     <Card.Title>{auction.title}</Card.Title>
                                     <Card.Text className="flex-fill">
-                                        {truncateText(auction.description, 20)}
+                                        {truncateText(auction.description, 30)}
                                     </Card.Text>
                                     <Card.Text>
                                         <strong>Starting Bid: </strong>${auction.startingBid}

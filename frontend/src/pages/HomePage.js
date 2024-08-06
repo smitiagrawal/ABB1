@@ -108,7 +108,7 @@ const HomePage = () => {
                                 <Card.Body>
                                     <Card.Title>{auction.title}</Card.Title>
                                     <Card.Text>
-                                        {truncateText(auction.description, 20)}
+                                        {truncateText(auction.description, 30)}
                                     </Card.Text>
                                     <Card.Text>
                                         <strong>Start Bid:</strong> ${auction.startingBid} <br />

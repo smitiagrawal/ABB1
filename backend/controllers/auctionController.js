@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const Auction = require('../models/auctionModel');
 const Bid = require('../models/bidModel');
+const { sendOutbidNotification } = require('../services/emailService');
 
 const getAuctions = asyncHandler(async (req, res) => {
     try {
@@ -103,11 +104,18 @@ const placeBid = asyncHandler(async (req, res) => {
         await bid.save();
         auction.currentBid = amount;
         await auction.save();
+        const previousBids = await Bid.find({ auction: auctionId }).populate('user');
+        const currentBidderEmail = req.user.email;
+        const previousBidders = previousBids
+            .map(bid => bid.user.email)
+            .filter(email => email !== currentBidderEmail);
+        await sendOutbidNotification(previousBidders, auction.title);
         res.status(201).json({
             bid,
             currentBid: auction.currentBid
         });
     } catch (error) {
+        console.error('Error placing bid:', error);
         res.status(500).json({ message: 'Error placing bid', error });
     }
 });

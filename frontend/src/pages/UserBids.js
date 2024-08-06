@@ -38,6 +38,7 @@ const listGroupItemStyle = {
   overflow: 'hidden',
   textOverflow: 'ellipsis',
 };
+
 const listGroupItemValueStyle = {
   textAlign: 'right',
   flex: 1,
@@ -58,7 +59,7 @@ const ShimmerLoader = () => (
           <ContentLoader
             speed={2}
             width={300}
-            height= 'auto'
+            height='auto'
             viewBox="0 0 300 500"
             backgroundColor="#f3f3f3"
             foregroundColor="#ecebeb"
@@ -72,14 +73,12 @@ const ShimmerLoader = () => (
             <rect x="10" y="360" rx="5" ry="5" width="90%" height="15" />
             <rect x="10" y="390" rx="5" ry="5" width="90%" height="15" />
             <rect x="10" y="450" rx="5" ry="5" width="30%" height="35" />
-
           </ContentLoader>
         </Card>
       </Col>
     ))}
   </Row>
 );
-
 
 const UserBids = () => {
   const [bids, setBids] = useState([]);
@@ -116,6 +115,10 @@ const UserBids = () => {
     return endDate && new Date(endDate) < new Date();
   };
 
+  const isUserOutbidded = (bid) => {
+    return bid.amount < bid.auction.currentBid;
+  };
+
   const latestBids = bids.reduce((acc, bid) => {
     if (bid.auction && bid.auction._id) {
       const auctionId = bid.auction._id;
@@ -142,20 +145,21 @@ const UserBids = () => {
       return 0;
     });
 
-  if (loading) {
-    return (
-      <Container>
-        <h2>My Bids</h2>
-        <ShimmerLoader />
-      </Container>
-    );
-  }
-
   return (
     <Container>
       <h1 className="my-4">My Bids</h1>
-      {error && <Alert variant="danger">{error}</Alert>}
-      {sortedBids.length > 0 ? (
+      {loading && <ShimmerLoader />}
+      {error && (
+        <Alert variant="danger" className="my-5">
+          {error}
+        </Alert>
+      )}
+      {!loading && !error && sortedBids.length === 0 && (
+        <Alert variant="info" className="my-5">
+          You have not placed any bids.
+        </Alert>
+      )}
+      {!loading && !error && sortedBids.length > 0 && (
         <Row className="g-4">
           {sortedBids.map(bid => (
             bid.auction && (
@@ -180,8 +184,13 @@ const UserBids = () => {
                         Closed
                       </Badge>
                     )}
+                    {isUserOutbidded(bid) && (
+                      <Badge bg="warning" className="position-absolute top-0 end-0">
+                        Outbidded
+                      </Badge>
+                    )}
                     <Card.Header>{bid.auction.title}</Card.Header>
-                    <Card.Text>{truncateText(bid.auction.description, 20)}</Card.Text>
+                    <Card.Text>{truncateText(bid.auction.description, 30)}</Card.Text>
                     <ListGroup className="list-group-flush">
                       <ListGroupItemFixed
                         label="Starting Bid:"
@@ -213,8 +222,6 @@ const UserBids = () => {
             )
           ))}
         </Row>
-      ) : (
-        <p>No bids found.</p>
       )}
     </Container>
   );
