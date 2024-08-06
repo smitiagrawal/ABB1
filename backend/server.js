@@ -5,27 +5,18 @@ const auctionRoutes = require('./routes/auctionRoutes');
 const userRoutes = require('./routes/userRoutes');
 const bidRoutes = require('./routes/bidRoutes');
 const dotenv = require('dotenv');
-const { getAuctionsForUser } = require('./config/db');
-const { protect } = require('./middleware/authMiddleware');
+const swaggerDocs = require('./swagger');
 
 const app = express();
 dotenv.config();
 app.use(cors());
 app.use(express.json());
 
-app.get('/api/auctions/user', protect, async (req, res) => {
-    try {
-        const userId = req.user.id;
-        const auctions = await getAuctionsForUser(userId);
-        res.json(auctions);
-    } catch (error) {
-        console.error('Error fetching auctions:', error);
-        res.status(500).json({ message: 'Internal Server Error', error: error.message });
-    }
-});
 app.use('/api/auctions', auctionRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/bids', bidRoutes);
+
+swaggerDocs(app);
 
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('MongoDB connected'))

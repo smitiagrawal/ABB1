@@ -87,7 +87,6 @@ export const updateUserProfile = async (profileData) => {
 
 export const getUserAuctions = async () => {
     const token = localStorage.getItem('token');
-    console.log('Token:', token);
     try {
         const response = await axios.get(`${API_URL}auctions/user`, {
             headers: {
