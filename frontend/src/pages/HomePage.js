@@ -18,7 +18,8 @@ const HomePage = () => {
         const fetchAllAuctions = async () => {
             try {
                 const data = await fetchAuctions();
-                setAuctions(data);
+                const currentAuctions = data.filter(auction => new Date(auction.endDate) > new Date());
+                setAuctions(currentAuctions);
                 setLoading(false);
             } catch (error) {
                 console.error('Error fetching auctions:', error);

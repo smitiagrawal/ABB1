@@ -100,10 +100,12 @@ const AddAuctionPage = () => {
                 as="textarea"
                 rows={3}
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={(e) => setDescription(e.target.value.slice(0, 150))}
+                // onChange={(e) => setDescription(e.target.value)}
                 placeholder="Enter description"
                 required
               />
+              <div style={{ textAlign: 'right', fontSize: 12 }}>{description.length}/150</div>
             </Form.Group>
             <Form.Group className="mb-3" controlId="formStartingBid">
               <Form.Label>Starting Bid</Form.Label>

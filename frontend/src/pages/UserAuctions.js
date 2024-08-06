@@ -1,8 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { getUserAuctions, updateAuction, deleteAuction, getBiddingHistory } from '../api'; // Adjust the import path as necessary
-import { Card, Container, Row, Col, Alert, Button, Modal, Form, ListGroup } from 'react-bootstrap';
+import { Card, Container, Row, Col, Alert, Button, Modal, Form, ListGroup, Badge } from 'react-bootstrap';
 import ContentLoader from 'react-content-loader';
 import 'bootstrap/dist/css/bootstrap.min.css';
+
+// Helper function to check if an auction is open
+const isAuctionOpen = (endDate) => {
+    return endDate && new Date(endDate) >= new Date();
+};
+
+// Helper function to check if an auction is closed
+const isAuctionClosed = (endDate) => {
+    return endDate && new Date(endDate) < new Date();
+};
+
+// Sort auctions: open first, then closed
+const sortAuctions = (auctions) => {
+    return auctions.sort((a, b) => {
+        const aIsOpen = isAuctionOpen(a.endDate);
+        const bIsOpen = isAuctionOpen(b.endDate);
+        if (aIsOpen && !bIsOpen) return -1;
+        if (!aIsOpen && bIsOpen) return 1;
+        return 0;
+    });
+};
 
 const UserAuctions = () => {
     const [auctions, setAuctions] = useState([]);
@@ -25,7 +46,7 @@ const UserAuctions = () => {
             try {
                 const data = await getUserAuctions();
                 console.log('Fetched Auctions:', data);
-                setAuctions(data);
+                setAuctions(sortAuctions(data));
                 setLoading(false);
             } catch (error) {
                 console.error('Error fetching user auctions:', error);
@@ -37,16 +58,18 @@ const UserAuctions = () => {
     }, []);
 
     const handleEditClick = (auction) => {
-        const endDate = new Date(auction.endDate);
-        setEditingAuction(auction);
-        setNewDetails({
-            title: auction.title,
-            description: auction.description,
-            startingBid: auction.startingBid,
-            endDate: formatDateForInput(endDate),
-            image: auction.image,
-        });
-        setShowEditModal(true);
+        if (auction) {
+            const endDate = new Date(auction.endDate);
+            setEditingAuction(auction);
+            setNewDetails({
+                title: auction.title,
+                description: auction.description,
+                startingBid: auction.startingBid,
+                endDate: formatDateForInput(endDate),
+                image: auction.image,
+            });
+            setShowEditModal(true);
+        }
     };
 
     const handleDeleteClick = async (auctionId) => {
@@ -65,14 +88,15 @@ const UserAuctions = () => {
 
     const handleUpdate = async (e) => {
         e.preventDefault();
+        if (!editingAuction) return; // Guard clause
         setLoading(true);
         setError('');
         try {
             const updatedEndDate = new Date(newDetails.endDate).toISOString();
             await updateAuction(editingAuction._id, { ...newDetails, endDate: updatedEndDate });
-            setAuctions(auctions.map(auction =>
+            setAuctions(sortAuctions(auctions.map(auction =>
                 auction._id === editingAuction._id ? { ...auction, ...newDetails, endDate: updatedEndDate } : auction
-            ));
+            )));
             setShowEditModal(false);
             setEditingAuction(null);
         } catch (error) {
@@ -139,7 +163,7 @@ const UserAuctions = () => {
 
     return (
         <Container>
-            <h1 className="my-4">Your Auctions</h1>
+            <h1 className="my-4">My Auctions</h1>
             {loading && renderShimmer()}
             {error && (
                 <Alert variant="danger" className="my-5">
@@ -150,7 +174,17 @@ const UserAuctions = () => {
                 <Row className="g-4">
                     {auctions.map(auction => (
                         <Col key={auction._id} xs={12} sm={6} md={4} lg={3}>
-                            <Card className="mb-4 d-flex flex-column" style={{ width: '100%', height: '100%', maxWidth: '300px' }}>
+                            <Card className="mb-4 d-flex flex-column" style={{ width: '100%', height: '100%', maxWidth: '300px', position: 'relative' }}>
+                                {isAuctionOpen(auction.endDate) && (
+                                    <Badge bg="success" className="position-absolute top-0 start-0">
+                                        Open
+                                    </Badge>
+                                )}
+                                {isAuctionClosed(auction.endDate) && (
+                                    <Badge bg="danger" className="position-absolute top-0 start-0">
+                                        Closed
+                                    </Badge>
+                                )}
                                 <Card.Img
                                     variant="top"
                                     src={auction.image}
@@ -175,15 +209,34 @@ const UserAuctions = () => {
                                     <Card.Text>
                                         <strong>End Date: </strong>{formatUTCDateToLocal(auction.endDate)}
                                     </Card.Text>
-                                    <Button variant="primary" onClick={() => handleEditClick(auction)}>Edit</Button>
-                                    <Button variant="danger" onClick={() => handleDeleteClick(auction._id)} className="mt-2">Delete</Button>
-                                    <Button variant="secondary" onClick={() => handleViewBiddingHistory(auction._id)} className="mt-2">View Bidding History</Button>
+                                    <Button 
+                                        variant="primary" 
+                                        onClick={() => handleEditClick(auction)}
+                                        disabled={isAuctionClosed(auction.endDate)}
+                                    >
+                                        Edit
+                                    </Button>
+                                    <Button 
+                                        variant="danger" 
+                                        onClick={() => handleDeleteClick(auction._id)} 
+                                        className="mt-2"
+                                    >
+                                        Delete
+                                    </Button>
+                                    <Button 
+                                        variant="info" 
+                                        onClick={() => handleViewBiddingHistory(auction._id)} 
+                                        className="mt-2"
+                                    >
+                                        View Bidding History
+                                    </Button>
                                 </Card.Body>
                             </Card>
                         </Col>
                     ))}
                 </Row>
             )}
+
             <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Edit Auction</Modal.Title>
@@ -194,9 +247,9 @@ const UserAuctions = () => {
                             <Form.Label>Title</Form.Label>
                             <Form.Control
                                 type="text"
-                                placeholder="Enter auction title"
                                 value={newDetails.title}
                                 onChange={(e) => setNewDetails({ ...newDetails, title: e.target.value })}
+                                required
                             />
                         </Form.Group>
                         <Form.Group controlId="formDescription">
@@ -204,40 +257,41 @@ const UserAuctions = () => {
                             <Form.Control
                                 as="textarea"
                                 rows={3}
-                                placeholder="Enter auction description"
                                 value={newDetails.description}
                                 onChange={(e) => setNewDetails({ ...newDetails, description: e.target.value })}
+                                required
                             />
                         </Form.Group>
                         <Form.Group controlId="formStartingBid">
                             <Form.Label>Starting Bid</Form.Label>
                             <Form.Control
                                 type="number"
-                                placeholder="Enter starting bid"
+                                step="0.01"
                                 value={newDetails.startingBid}
-                                onChange={(e) => setNewDetails({ ...newDetails, startingBid: e.target.value })}
+                                onChange={(e) => setNewDetails({ ...newDetails, startingBid: parseFloat(e.target.value) })}
+                                required
+                                disabled={editingAuction && editingAuction.currentBid > 0} // Disable if current bid exists
                             />
                         </Form.Group>
                         <Form.Group controlId="formEndDate">
                             <Form.Label>End Date</Form.Label>
                             <Form.Control
                                 type="datetime-local"
-                                placeholder="Select end date"
                                 value={newDetails.endDate}
                                 onChange={(e) => setNewDetails({ ...newDetails, endDate: e.target.value })}
+                                required
                             />
                         </Form.Group>
                         <Form.Group controlId="formImage">
                             <Form.Label>Image URL</Form.Label>
                             <Form.Control
                                 type="text"
-                                placeholder="Enter image URL"
                                 value={newDetails.image}
                                 onChange={(e) => setNewDetails({ ...newDetails, image: e.target.value })}
                             />
                         </Form.Group>
-                        <Button variant="primary" type="submit" className="mt-3">
-                            Update Auction
+                        <Button variant="primary" type="submit" className="mt-3" disabled={isAuctionClosed(newDetails.endDate)}>
+                            Save Changes
                         </Button>
                     </Form>
                 </Modal.Body>
@@ -258,7 +312,7 @@ const UserAuctions = () => {
                             ))}
                         </ListGroup>
                     ) : (
-                        <p>No bidding history available.</p>
+                        <Alert variant="info">No bids placed yet.</Alert>
                     )}
                 </Modal.Body>
             </Modal>

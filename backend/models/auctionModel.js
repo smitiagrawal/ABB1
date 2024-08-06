@@ -33,8 +33,14 @@ const auctionSchema = mongoose.Schema(
         },
     },
     {
-        timestamps: true
+        timestamps: true,
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true },
     }
 );
+
+auctionSchema.virtual('isClosed').get(function () {
+    return new Date() > this.endDate;
+});
 
 module.exports = mongoose.model('Auction', auctionSchema);

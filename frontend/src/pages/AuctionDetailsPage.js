@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getAuctionDetails, placeBid } from '../api';
+import { getAuctionDetails, placeBid, getBiddingHistory } from '../api';
 import { useAuth } from '../context/AuthContext';
-import { Container, Card, Button, Form, Alert, Row, Col } from 'react-bootstrap';
+import { Container, Card, Button, Form, Alert, Row, Col, Modal, ListGroup } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const AuctionDetailsPage = () => {
@@ -12,6 +12,8 @@ const AuctionDetailsPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState('');
+    const [bids, setBids] = useState([]);
+    const [showModal, setShowModal] = useState(false);
     const { user } = useAuth();
     const navigate = useNavigate();
 
@@ -61,6 +63,24 @@ const AuctionDetailsPage = () => {
         return amount > auction.currentBid && amount > auction.startingBid;
     };
 
+    const isAuctionClosed = () => {
+        if (!auction || !auction.endDate) return false;
+        return new Date(auction.endDate) < new Date();
+    };
+
+    const handleShowModal = async () => {
+        try {
+            const data = await getBiddingHistory(id);
+            setBids(data.slice(0, 5));
+            setShowModal(true);
+        } catch (error) {
+            console.error('Error fetching bidding history:', error);
+            setError('Failed to fetch bidding history. Please try again later.');
+        }
+    };
+
+    const handleCloseModal = () => setShowModal(false);
+
     if (loading) return <Container>Loading...</Container>;
 
     if (error) return <Container>{error}</Container>;
@@ -77,8 +97,8 @@ const AuctionDetailsPage = () => {
                             <Card.Text><strong>Starting Bid:</strong> ${auction.startingBid}</Card.Text>
                             <Card.Text><strong>Current Bid:</strong> ${auction.currentBid}</Card.Text>
                             <Card.Text><strong>End Date:</strong> {new Date(auction.endDate).toLocaleString()}</Card.Text>
-                            <Button variant="info" onClick={() => navigate(`/auction/${id}/bids`)}>View Bidding History</Button>
-                            {user && (
+                            <Button variant="info" onClick={handleShowModal}>View Bidding History</Button>
+                            {user && !isAuctionClosed() && (
                                 <Form onSubmit={handleBidSubmit} className="mt-4">
                                     <Form.Group controlId="formBidAmount">
                                         <Form.Label>Bid Amount</Form.Label>
@@ -105,10 +125,42 @@ const AuctionDetailsPage = () => {
                                     {error && <Alert variant="danger" className="mt-3">{error}</Alert>}
                                 </Form>
                             )}
+                            {user && isAuctionClosed() && (
+                                <Alert variant="warning" className="mt-3">
+                                    Bidding for this auction has ended.
+                                </Alert>
+                            )}
                         </Card.Body>
                     </Card>
                 </Col>
             </Row>
+
+            <Modal show={showModal} onHide={handleCloseModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Bidding History</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {bids.length > 0 ? (
+                        <ListGroup>
+                            {bids.map((bid, index) => (
+                                <ListGroup.Item key={index}>
+                                    <strong>Bid:</strong> ${bid.amount} - <strong>Date:</strong> {new Date(bid.date).toLocaleString()}
+                                </ListGroup.Item>
+                            ))}
+                        </ListGroup>
+                    ) : (
+                        <p>No bids found.</p>
+                    )}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="info" onClick={() => navigate(`/auction/${id}/bids`)}>
+                        See More
+                    </Button>
+                    <Button variant="secondary" onClick={handleCloseModal}>
+                        Close
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </Container>
     );
 };

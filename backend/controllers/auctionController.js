@@ -4,12 +4,14 @@ const Bid = require('../models/bidModel');
 
 const getAuctions = asyncHandler(async (req, res) => {
     try {
-        const auctions = await Auction.find();
+        const currentDate = new Date();
+        const auctions = await Auction.find({ endDate: { $gte: currentDate } });
         res.json(auctions);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching auctions', error });
     }
 });
+
 
 const getUserAuctions = asyncHandler(async (req, res) => {
     const userId = req.user._id;
@@ -17,7 +19,7 @@ const getUserAuctions = asyncHandler(async (req, res) => {
         if (!userId) {
             return res.status(400).json({ message: 'User ID is missing' });
         }
-        const auctions = await Auction.find({ user: userId });
+        const auctions = await Auction.find({ user: userId }).lean();
         if (auctions.length > 0) {
             res.status(200).json(auctions);
         } else {
@@ -28,6 +30,7 @@ const getUserAuctions = asyncHandler(async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
 });
+
 
 const createAuction = asyncHandler(async (req, res) => {
     try {
