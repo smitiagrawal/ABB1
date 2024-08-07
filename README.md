@@ -1,3 +1,6 @@
+Demo: https://github.com/user-attachments/assets/56f352d2-7835-42da-93d7-f0916cc5a4f9
+
+
 Our auction platform allows users to create, view, and manage auctions, place bids, and track their bidding history. Key functionalities include:
 
 •	User Registration and Login: Secure sign-up and authentication processes.
