@@ -13,9 +13,8 @@ Our auction platform allows users to create, view, and manage auctions, place bi
 Steps to Reproduce
 To set up and run the project locally, follow these steps:
 1.	Clone the Repository: 
-git clone https://github.com/smitiagrawal/ABB1.git
+git clone https://github.com/smitiagrawal/Auction-Bidding
 
-cd ABB1
 
 2.	Install Dependencies:
 npm install
